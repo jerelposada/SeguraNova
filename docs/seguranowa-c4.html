@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SeguraNova — Diagrama C4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --border: #1e2d40;
+    --accent: #00d4ff;
+    --accent2: #00ff9d;
+    --accent3: #ff6b35;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --person: #1a3a5c;
+    --person-border: #00d4ff;
+    --system: #0f2d1f;
+    --system-border: #00ff9d;
+    --external: #2d1a0f;
+    --external-border: #ff6b35;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+
+  header { margin-bottom: 3rem; animation: fadeDown 0.6s ease both; }
+
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  h1 { font-size: 2rem; font-weight: 600; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; font-family: 'IBM Plex Mono', monospace; }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    animation: fadeDown 0.6s ease 0.1s both;
+  }
+
+  .tab {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.6rem 1.1rem;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .diagram-area { display: none; animation: fadeIn 0.4s ease both; }
+  .diagram-area.active { display: block; }
+
+  .c4-canvas {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+
+  .level-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .boundary {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    margin: 1rem 0;
+  }
+
+  .boundary-label {
+    position: absolute;
+    top: -0.7rem;
+    left: 1rem;
+    background: var(--surface);
+    padding: 0 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .row { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; margin: 1rem 0; }
+
+  .node {
+    width: 155px;
+    border-radius: 6px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .node:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .node.person { background: var(--person); border: 1px solid var(--person-border); }
+  .node.system-main { background: var(--system); border: 2px solid var(--system-border); width: 210px; }
+  .node.external { background: var(--external); border: 1px solid var(--external-border); }
+
+  .node-icon { font-size: 1.5rem; margin-bottom: 0.4rem; display: block; }
+  .node-title { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; }
+  .node-type { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .node-desc { font-size: 0.68rem; color: #94a3b8; line-height: 1.4; }
+  .node.system-main .node-title { color: var(--accent2); font-size: 0.88rem; }
+  .node.person .node-title { color: var(--accent); }
+  .node.external .node-title { color: var(--accent3); }
+
+  .arrows-section { margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  .arrows-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.05em; }
+  .arrow-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .arrow-item { display: flex; align-items: center; gap: 0.7rem; font-size: 0.76rem; flex-wrap: wrap; }
+  .arrow-from { color: var(--accent); font-weight: 600; font-size: 0.73rem; }
+  .arrow-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem; color: var(--muted); }
+  .arrow-to { color: var(--accent2); font-weight: 600; font-size: 0.73rem; }
+  .arrow-arrow { color: var(--muted); }
+
+  .legend { display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; border: 1px solid; }
+
+  .containers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-top: 1rem; }
+
+  .container-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeIn 0.5s ease both;
+  }
+  .container-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .container-card.highlight { border-color: var(--accent2); }
+  .container-card.admin { border-color: #a78bfa; }
+
+  .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
+  .card-icon { font-size: 1.2rem; }
+  .card-title { font-size: 0.83rem; font-weight: 600; color: var(--text); }
+  .card-tech {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+    display: inline-block;
+  }
+  .card-tech.purple { color: #a78bfa; background: rgba(167,139,250,0.08); }
+  .card-desc { font-size: 0.7rem; color: #94a3b8; line-height: 1.5; }
+
+  .features-list { margin-top: 0.6rem; padding-left: 0; list-style: none; }
+  .features-list li { font-size: 0.67rem; color: #64748b; padding: 0.15rem 0; }
+  .features-list li::before { content: '→ '; color: var(--accent2); }
+
+  .adr-list { display: flex; flex-direction: column; gap: 0.8rem; }
+  .adr-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    animation: fadeIn 0.4s ease both;
+  }
+  .adr-number { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--accent2); margin-bottom: 0.3rem; }
+  .adr-title { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+  .adr-decision { font-size: 0.73rem; color: #94a3b8; line-height: 1.6; }
+  .adr-status {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+  }
+  .adr-status.accepted { background: rgba(0,255,157,0.1); color: var(--accent2); border: 1px solid var(--accent2); }
+
+  /* Admin panel features */
+  .admin-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .feature-card {
+    background: rgba(167,139,250,0.05);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 6px;
+    padding: 0.9rem;
+    animation: fadeIn 0.4s ease both;
+  }
+  .feature-card:hover { border-color: #a78bfa; }
+  .feature-title { font-size: 0.78rem; font-weight: 600; color: #a78bfa; margin-bottom: 0.3rem; }
+  .feature-desc { font-size: 0.68rem; color: #94a3b8; line-height: 1.4; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">ARQUITECTURA / C4 MODEL v2</div>
+    <h1>Segura<span>Nova</span> — Enterprise AI Agent</h1>
+    <p class="subtitle">// agente empresarial de conocimiento interno · .NET 8 + AWS</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('nivel1', this)">Nivel 1 — Contexto</button>
+    <button class="tab" onclick="showTab('nivel2', this)">Nivel 2 — Contenedores</button>
+    <button class="tab" onclick="showTab('adminpanel', this)">Panel Admin</button>
+    <button class="tab" onclick="showTab('adrs', this)">ADRs</button>
+  </div>
+
+  <!-- NIVEL 1 -->
+  <div class="diagram-area active" id="nivel1">
+    <div class="c4-canvas">
+      <div class="level-label">// C4 LEVEL 1 · SYSTEM CONTEXT DIAGRAM</div>
+
+      <div class="row">
+        <div class="node person">
+          <span class="node-icon">👤</span>
+          <div class="node-title">Empleado</div>
+          <div class="node-type">[Person]</div>
+          <div class="node-desc">Consulta políticas, coberturas y procedimientos en lenguaje natural</div>
+        </div>
+        <div class="node person">
+          <span class="node-icon">🛡️</span>
+          <div class="node-title">Agente de Siniestros</div>
+          <div class="node-type">[Person]</div>
+          <div class="node-desc">Consulta procedimientos de reclamación y tiempos de respuesta</div>
+        </div>
+        <div class="node person">
+          <span class="node-icon">⚙️</span>
+          <div class="node-title">Admin TI</div>
+          <div class="node-type">[Person]</div>
+          <div class="node-desc">Gestiona documentos, roles, permisos y monitorea el sistema</div>
+        </div>
+      </div>
+
+      <div style="text-align:center; color: #334155; font-size: 1.4rem; letter-spacing: 0.5rem; margin: 0.5rem 0;">↓ ↓ ↓</div>
+
+      <div class="boundary">
+        <span class="boundary-label">SeguraNova Internal Systems</span>
+        <div class="row">
+          <div class="node system-main">
+            <span class="node-icon">🤖</span>
+            <div class="node-title">Enterprise AI Agent</div>
+            <div class="node-type">[Software System]</div>
+            <div class="node-desc">Responde preguntas en lenguaje natural sobre documentos internos y datos reales. Cita fuentes y aprende del historial.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; color: #334155; font-size: 1.4rem; letter-spacing: 0.5rem; margin: 0.5rem 0;">↓ ↓ ↓</div>
+
+      <div class="row">
+        <div class="node external">
+          <span class="node-icon">🧠</span>
+          <div class="node-title">Amazon Bedrock</div>
+          <div class="node-type">[External — AWS]</div>
+          <div class="node-desc">LLM Claude. Razonamiento y generación de respuestas</div>
+        </div>
+        <div class="node external">
+          <span class="node-icon">🗄️</span>
+          <div class="node-title">Aurora PostgreSQL</div>
+          <div class="node-type">[External — AWS]</div>
+          <div class="node-desc">BD relacional + pgvector. Datos, pólizas y embeddings</div>
+        </div>
+        <div class="node external">
+          <span class="node-icon">📦</span>
+          <div class="node-title">Amazon S3</div>
+          <div class="node-type">[External — AWS]</div>
+          <div class="node-desc">Almacena PDFs y documentos internos de SeguraNova</div>
+        </div>
+        <div class="node external">
+          <span class="node-icon">🔐</span>
+          <div class="node-title">Amazon Cognito</div>
+          <div class="node-type">[External — AWS]</div>
+          <div class="node-desc">Autenticación, roles y permisos de usuarios</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--person);border-color:var(--person-border)"></div>Person</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--system);border-color:var(--system-border)"></div>Sistema principal</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--external);border-color:var(--external-border)"></div>Sistema externo / AWS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NIVEL 2 -->
+  <div class="diagram-area" id="nivel2">
+    <div class="c4-canvas">
+      <div class="level-label">// C4 LEVEL 2 · CONTAINER DIAGRAM — Enterprise AI Agent</div>
+      <div class="containers-grid">
+
+        <div class="container-card admin">
+          <div class="card-header"><span class="card-icon">🔐</span><div class="card-title">Auth / Login</div></div>
+          <div class="card-tech purple">Angular 18 + Amazon Cognito</div>
+          <div class="card-desc">Login con JWT. Roles: Admin TI, Empleado, Agente de Siniestros. Guards por ruta.</div>
+        </div>
+
+        <div class="container-card admin">
+          <div class="card-header"><span class="card-icon">⚙️</span><div class="card-title">Admin Panel</div></div>
+          <div class="card-tech purple">Angular 18</div>
+          <div class="card-desc">Gestión de documentos, usuarios, roles, métricas y audit log. Solo accesible para Admin TI.</div>
+          <ul class="features-list">
+            <li>Upload PDF → S3</li>
+            <li>Estado del documento</li>
+            <li>Versioning de docs</li>
+            <li>Historial conversaciones</li>
+            <li>Audit log</li>
+            <li>Chunk preview</li>
+          </ul>
+        </div>
+
+        <div class="container-card">
+          <div class="card-header"><span class="card-icon">🌐</span><div class="card-title">Chat UI</div></div>
+          <div class="card-tech">Angular 18</div>
+          <div class="card-desc">Interfaz de chat para empleados. Muestra respuestas con fuentes citadas (documento + página).</div>
+        </div>
+
+        <div class="container-card highlight">
+          <div class="card-header"><span class="card-icon">🤖</span><div class="card-title">Agent API</div></div>
+          <div class="card-tech">ASP.NET Core 8 + Semantic Kernel</div>
+          <div class="card-desc">Orquesta el agente. Decide entre RAG o MCP Tools en tiempo real. Core del sistema.</div>
+        </div>
+
+        <div class="container-card">
+          <div class="card-header"><span class="card-icon">📄</span><div class="card-title">Document Ingestion</div></div>
+          <div class="card-tech">.NET Worker Service</div>
+          <div class="card-desc">Procesa PDFs desde S3, genera embeddings y los almacena en pgvector. Muestra estado en tiempo real.</div>
+        </div>
+
+        <div class="container-card">
+          <div class="card-header"><span class="card-icon">🔧</span><div class="card-title">MCP Tools</div></div>
+          <div class="card-tech">.NET — herramientas custom</div>
+          <div class="card-desc">Herramientas que el agente invoca: consultar pólizas, clientes, siniestros en Aurora PostgreSQL.</div>
+        </div>
+
+        <div class="container-card">
+          <div class="card-header"><span class="card-icon">🗄️</span><div class="card-title">Aurora PostgreSQL + pgvector</div></div>
+          <div class="card-tech">AWS — BD relacional + vectorial</div>
+          <div class="card-desc">Datos relacionales + embeddings vectoriales. Historial de conversaciones y audit log.</div>
+        </div>
+
+      </div>
+
+      <div class="arrows-section">
+        <div class="arrows-title">// FLUJO DE DECISIÓN DEL AGENTE</div>
+        <div class="arrow-list">
+          <div class="arrow-item">
+            <span class="arrow-from">Empleado</span><span class="arrow-arrow">→</span>
+            <span class="arrow-label">pregunta en lenguaje natural</span><span class="arrow-arrow">→</span>
+            <span class="arrow-to">Agent API</span>
+          </div>
+          <div class="arrow-item">
+            <span class="arrow-from">Agent API</span><span class="arrow-arrow">→</span>
+            <span class="arrow-label">¿documentos o datos reales?</span><span class="arrow-arrow">→</span>
+            <span class="arrow-to">Semantic Kernel decide</span>
+          </div>
+          <div class="arrow-item">
+            <span class="arrow-from">Si RAG</span><span class="arrow-arrow">→</span>
+            <span class="arrow-label">búsqueda semántica en pgvector</span><span class="arrow-arrow">→</span>
+            <span class="arrow-to">Aurora + cita fuente + página</span>
+          </div>
+          <div class="arrow-item">
+            <span class="arrow-from">Si datos reales</span><span class="arrow-arrow">→</span>
+            <span class="arrow-label">invoca MCP Tool</span><span class="arrow-arrow">→</span>
+            <span class="arrow-to">Aurora PostgreSQL</span>
+          </div>
+          <div class="arrow-item">
+            <span class="arrow-from">Respuesta</span><span class="arrow-arrow">→</span>
+            <span class="arrow-label">se guarda en historial</span><span class="arrow-arrow">→</span>
+            <span class="arrow-to">Aurora → Admin puede revisar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="diagram-area" id="adminpanel">
+    <div class="c4-canvas">
+      <div class="level-label">// PANEL ADMINISTRATIVO — FUNCIONALIDADES DETALLADAS</div>
+      <div class="admin-features">
+
+        <div class="feature-card">
+          <div class="feature-title">🔐 Login + Roles</div>
+          <div class="feature-desc">Autenticación con Amazon Cognito. Roles: Admin TI, Empleado, Agente Siniestros. Guards de ruta en Angular. JWT con refresh token.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📤 Upload PDF → S3</div>
+          <div class="feature-desc">Drag & drop de documentos PDF. Upload directo a S3 con presigned URL. Trigger automático al Worker de ingestion al subir.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📊 Estado del Documento</div>
+          <div class="feature-desc">Pipeline visible: Subido → Procesando → Generando embeddings → Listo. Polling o WebSocket para actualización en tiempo real.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🗂️ Versioning de Documentos</div>
+          <div class="feature-desc">Subir nueva versión sin borrar la anterior. Historial de versiones por documento. El agente siempre usa la versión activa.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🔍 Chunk Preview</div>
+          <div class="feature-desc">Visualizar cómo quedó fragmentado el PDF antes de indexarlo. Ayuda al admin a detectar problemas de calidad en el RAG.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">💬 Historial de Conversaciones</div>
+          <div class="feature-desc">El admin ve qué preguntan los empleados y cuáles no tuvieron buena respuesta. Permite identificar documentos faltantes.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📚 Fuentes Citadas</div>
+          <div class="feature-desc">Cada respuesta del agente muestra el documento fuente y la página. El admin puede auditar la calidad de las respuestas.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📋 Audit Log</div>
+          <div class="feature-desc">Registro de quién subió qué documento, cuándo y qué cambios hubo. Requisito enterprise en cualquier sistema de gestión documental.</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">📈 Métricas de Uso</div>
+          <div class="feature-desc">Consultas por día, documentos más consultados, tiempo promedio de respuesta, tasa de respuestas sin fuente (gap de conocimiento).</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-title">🗑️ Eliminar Documentos</div>
+          <div class="feature-desc">Elimina documento de S3 y sus embeddings de pgvector. Soft delete con confirmación. Los chats históricos conservan la referencia.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ADRs -->
+  <div class="diagram-area" id="adrs">
+    <div class="adr-list">
+
+      <div class="adr-item">
+        <div class="adr-number">ADR-001</div>
+        <div class="adr-title">Aurora PostgreSQL + pgvector en lugar de BD vectorial dedicada</div>
+        <div class="adr-decision">
+          <strong>Contexto:</strong> El sistema necesita datos relacionales (pólizas, clientes, siniestros, historial, audit log) y embeddings vectoriales para RAG.<br><br>
+          <strong>Decisión:</strong> Una sola Aurora PostgreSQL con pgvector en lugar de RDS + OpenSearch o Pinecone.<br><br>
+          <strong>Consecuencias:</strong> Menor complejidad operacional, un solo punto de conexión, sin sincronización entre BDs. Trade-off: menor performance vectorial vs OpenSearch a escala masiva — aceptable para este dominio enterprise mediano.
+        </div>
+        <span class="adr-status accepted">✓ ACCEPTED</span>
+      </div>
+
+      <div class="adr-item">
+        <div class="adr-number">ADR-002</div>
+        <div class="adr-title">Semantic Kernel como orquestador del agente</div>
+        <div class="adr-decision">
+          <strong>Contexto:</strong> Se necesita orquestación de agentes compatible con .NET, con soporte para RAG y herramientas MCP custom.<br><br>
+          <strong>Decisión:</strong> Microsoft Semantic Kernel sobre LangChain (Python) o solución custom.<br><br>
+          <strong>Consecuencias:</strong> Integración nativa con .NET, soporte oficial Microsoft, compatibilidad con Bedrock. Comunidad más pequeña que LangChain pero en crecimiento activo.
+        </div>
+        <span class="adr-status accepted">✓ ACCEPTED</span>
+      </div>
+
+      <div class="adr-item">
+        <div class="adr-number">ADR-003</div>
+        <div class="adr-title">Amazon Bedrock (Claude) como LLM</div>
+        <div class="adr-decision">
+          <strong>Contexto:</strong> Stack 100% AWS. Se necesita un LLM con capacidad de razonamiento para decidir entre RAG y MCP Tools.<br><br>
+          <strong>Decisión:</strong> Amazon Bedrock con Claude. Todo el stack permanece en AWS.<br><br>
+          <strong>Consecuencias:</strong> Sin salida de datos a Azure, facturación unificada AWS, latencia óptima en misma región. Trade-off: menor ecosistema de herramientas vs OpenAI.
+        </div>
+        <span class="adr-status accepted">✓ ACCEPTED</span>
+      </div>
+
+      <div class="adr-item">
+        <div class="adr-number">ADR-004</div>
+        <div class="adr-title">Clean Architecture con separación estricta de capas</div>
+        <div class="adr-decision">
+          <strong>Contexto:</strong> Múltiples fuentes de datos (RAG, BD relacional, LLM externo, S3). Sistema que debe ser mantenible y testeable.<br><br>
+          <strong>Decisión:</strong> Clean Architecture — Domain, Application, Infrastructure, API. El dominio no tiene dependencias externas.<br><br>
+          <strong>Consecuencias:</strong> Alta testabilidad del dominio sin infraestructura. El agente y MCP Tools viven en Application. Infrastructure maneja Bedrock, pgvector y S3.
+        </div>
+        <span class="adr-status accepted">✓ ACCEPTED</span>
+      </div>
+
+      <div class="adr-item">
+        <div class="adr-number">ADR-005</div>
+        <div class="adr-title">Amazon Cognito para autenticación y gestión de roles</div>
+        <div class="adr-decision">
+          <strong>Contexto:</strong> El sistema necesita autenticación con múltiples roles (Admin TI, Empleado, Agente Siniestros) y el stack es 100% AWS.<br><br>
+          <strong>Decisión:</strong> Amazon Cognito sobre solución custom o Auth0.<br><br>
+          <strong>Consecuencias:</strong> Integración nativa con AWS IAM, sin servidor de auth propio, JWT estándar. Trade-off: curva de configuración inicial vs flexibilidad de Auth0.
+        </div>
+        <span class="adr-status accepted">✓ ACCEPTED</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.diagram-area').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<main class="login-page" aria-label="Página de inicio de sesión">
+  <article class="login-card" aria-labelledby="login-title">
+
+    <!-- ── Brand Header ───────────────────────────────────── -->
+    <header class="card-header">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 4L6 12V24C6 33.941 14.059 42 24 44C33.941 42 42 33.941 42 24V12L24 4Z"
+            fill="url(#shield-gradient)" />
+          <path d="M17 24l5 5 9-9" stroke="white" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="shield-gradient" x1="6" y1="4" x2="42" y2="44"
+              gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#818CF8" />
+              <stop offset="100%" stop-color="#4338CA" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 id="login-title" class="card-title">Bienvenido de vuelta</h1>
+      <p class="card-subtitle">Accede a tu cuenta SeguraNova</p>
+    </header>
+
+    <!-- ── Alerts ─────────────────────────────────────────── -->
+    @if (loginError()) {
+      <div class="alert alert--error" role="alert" aria-live="assertive">
+        <svg class="alert__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+          <path d="M12 7v5M12 16.5h.01" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" />
+        </svg>
+        <span>{{ loginError() }}</span>
+      </div>
+    }
+
+    @if (loginSuccess()) {
+      <div class="alert alert--success" role="status" aria-live="polite">
+        <svg class="alert__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+          <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>¡Inicio de sesión exitoso!</span>
+      </div>
+    }
+
+    <!-- ── Form ───────────────────────────────────────────── -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="login-form">
+
+      <!-- Email -->
+      <div class="field"
+        [class.field--invalid]="isFieldInvalid('email')"
+        [class.field--valid]="!isFieldInvalid('email')">
+        <label for="email" class="field__label">Correo electrónico</label>
+        <div class="field__wrapper">
+          <span class="field__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </span>
+          <input
+            id="email"
+            type="email"
+            class="field__input"
+            formControlName="email"
+            placeholder="tu@email.com"
+            autocomplete="email"
+            [attr.aria-invalid]="isFieldInvalid('email') || null"
+            aria-describedby="email-error" />
+          @if (!isFieldInvalid('email')) {
+            <span class="field__status field__status--valid" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          }
+          @if (isFieldInvalid('email')) {
+            <span class="field__status field__status--error" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" />
+              </svg>
+            </span>
+          }
+        </div>
+        @if (isFieldInvalid('email')) {
+          <p id="email-error" class="field__message field__message--error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            {{ getEmailError() }}
+          </p>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="field"
+        [class.field--invalid]="isFieldInvalid('password')"
+        [class.field--valid]="!isFieldInvalid('password')">
+        <label for="password" class="field__label">Contraseña</label>
+        <div class="field__wrapper">
+          <span class="field__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor"
+                stroke-width="1.5" />
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" />
+            </svg>
+          </span>
+          <input
+            id="password"
+            [type]="passwordInputType()"
+            class="field__input field__input--has-toggle"
+            formControlName="password"
+            placeholder="Mínimo 8 caracteres"
+            autocomplete="current-password"
+            [attr.aria-invalid]="isFieldInvalid('password') || null"
+            aria-describedby="password-error" />
+          <button
+            type="button"
+            class="field__toggle"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            [attr.aria-pressed]="showPassword()">
+            @if (showPassword()) {
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (isFieldInvalid('password')) {
+          <p id="password-error" class="field__message field__message--error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            {{ getPasswordError() }}
+          </p>
+        }
+      </div>
+
+      <!-- Remember me & Forgot password -->
+      <div class="form-options">
+        <label class="checkbox-field" for="rememberMe">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            class="checkbox-field__input"
+            formControlName="rememberMe" />
+          <span class="checkbox-field__box" aria-hidden="true">
+            <svg class="checkbox-field__check" viewBox="0 0 24 24" fill="none">
+              <path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="checkbox-field__label">Recordarme</span>
+        </label>
+        <a href="#" class="link link--forgot">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="btn btn--primary"
+        [disabled]="isLoading()"
+        [class.btn--loading]="isLoading()"
+        [attr.aria-busy]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Iniciando sesión…</span>
+        } @else {
+          <svg class="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"
+              stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          <span>Iniciar sesión</span>
+        }
+      </button>
+
+    </form>
+
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer class="card-footer">
+      <p>¿No tienes cuenta? <a href="#" class="link link--signup">Créala gratis</a></p>
+    </footer>
+
+  </article>
+</main>

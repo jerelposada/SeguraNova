@@ -1,1 +1,135 @@
-/* You can add global styles to this file, and also import other style files */
+/* ── Google Fonts — Inter ───────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Global reset & base ────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+/* ================================================================
+   SEGURANOVA — Design System Tokens (Global)
+   Paleta: Indigo Soft #6366F1 · Color Theory derivation
+   Disponibles en toda la aplicación vía var(--token)
+   ================================================================ */
+:root {
+  /* ── Neumorphic palette (Light) */
+  --clr-bg:             #ECEDF8;
+  --clr-surface:        #F2F3FC;
+  --clr-sh-dark:        #C5C6D8;
+  --clr-sh-light:       #FFFFFF;
+
+  /* ── Brand — Indigo Soft */
+  --clr-primary:        #6366F1;
+  --clr-primary-hover:  #4F46E5;
+  --clr-primary-active: #4338CA;
+  --clr-primary-glow:   rgba(99, 102, 241, 0.22);
+  --clr-primary-soft:   #818CF8;
+  --clr-primary-ultra:  #E0E7FF;
+
+  /* ── Text */
+  --clr-heading:        #1E1B4B;
+  --clr-body:           #3730A3;
+  --clr-muted:          #64748B;
+  --clr-placeholder:    #A5B4FC;
+  --clr-on-primary:     #FFFFFF;
+
+  /* ── Semantic */
+  --clr-success:        #059669;
+  --clr-success-bg:     #D1FAE5;
+  --clr-success-border: #6EE7B7;
+  --clr-error:          #DC2626;
+  --clr-error-bg:       #FEE2E2;
+  --clr-error-border:   #FCA5A5;
+
+  /* ── Neumorphic shadow system (luz sup-izq / sombra inf-der) */
+  --neu-xs:       3px 3px 6px var(--clr-sh-dark),     -3px -3px 6px var(--clr-sh-light);
+  --neu-sm:       5px 5px 10px var(--clr-sh-dark),    -5px -5px 10px var(--clr-sh-light);
+  --neu-md:       8px 8px 16px var(--clr-sh-dark),    -8px -8px 16px var(--clr-sh-light);
+  --neu-lg:       12px 12px 24px var(--clr-sh-dark),  -12px -12px 24px var(--clr-sh-light);
+  --neu-xl:       16px 16px 32px var(--clr-sh-dark),  -16px -16px 32px var(--clr-sh-light);
+  --neu-inset-xs: inset 2px 2px 5px var(--clr-sh-dark),  inset -2px -2px 5px var(--clr-sh-light);
+  --neu-inset:    inset 4px 4px 9px var(--clr-sh-dark),  inset -4px -4px 9px var(--clr-sh-light);
+  --neu-pressed:  inset 6px 6px 12px var(--clr-sh-dark), inset -6px -6px 12px var(--clr-sh-light);
+
+  /* ── Spacing — sistema 8px */
+  --sp-1:  8px;
+  --sp-2:  16px;
+  --sp-3:  24px;
+  --sp-4:  32px;
+  --sp-5:  40px;
+  --sp-6:  48px;
+
+  /* ── Border radii */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-lg:   20px;
+  --r-xl:   28px;
+  --r-2xl:  36px;
+  --r-pill: 9999px;
+
+  /* ── Typography */
+  --font:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fs-xs:  0.75rem;
+  --fs-sm:  0.875rem;
+  --fs-md:  1rem;
+  --fs-lg:  1.125rem;
+  --fs-xl:  1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 1.875rem;
+
+  /* ── Easing */
+  --ease:        cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast:  150ms var(--ease);
+  --t-base:  250ms var(--ease);
+  --t-slow:  400ms var(--ease);
+}
+
+/* ── Dark mode — token overrides ───────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --clr-bg:            #13142B;
+    --clr-surface:       #1A1C35;
+    --clr-sh-dark:       #0C0D1E;
+    --clr-sh-light:      #282B50;
+
+    --clr-heading:       #EDEEFF;
+    --clr-body:          #C7C8F0;
+    --clr-muted:         #94A3B8;
+    --clr-placeholder:   #4B5563;
+    --clr-primary-ultra: rgba(99, 102, 241, 0.15);
+    --clr-on-primary:    #FFFFFF;
+  }
+}
