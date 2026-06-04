@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "user-authentication",
+    "description": "Autenticación JWT completa: Angular 18 → AuthController (.NET 8) → PostgreSQL (Docker). Claims: sub, email, roles[], knowledge_bases[]. Access token 60min, refresh token 7 días con renovación automática vía interceptor. Roles: admin_ti → /admin, agente_siniestros y empleado → /chat. Sin ASP.NET Core Identity, solo BCrypt.Net-Next.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 2,
+    "name": "auth-service-frontend",
+    "description": "Reemplazar simulación actual de AuthService.signIn() por llamada real a POST /api/auth/login. Guardar tokens en localStorage con keys sn_access_token y sn_refresh_token. Exponer signOut() y refreshToken().",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 3,
+    "name": "auth-interceptor",
+    "description": "HttpInterceptor funcional Angular 18 (withInterceptors, no clase). Adjunta Authorization: Bearer en cada request excepto login y refresh. Maneja 401: llama refreshToken(), reintenta con switchMap, si falla llama signOut().",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 4,
+    "name": "auth-guard-role-redirect",
+    "description": "canActivate guard funcional. Decodifica JWT con atob sin librería. Redirige a /login si no hay token o está expirado. Tras login exitoso redirige según rol: admin_ti → /admin, resto → /chat.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 5,
+    "name": "domain-entities-ef-core",
+    "description": "Entidades de dominio: User, Role, UserRole, UserKnowledgeBase con Guid como PK. ApplicationDbContext con EF Core + Npgsql. Migración inicial. Seed con usuario admin hasheado con BCrypt. KnowledgeBase enum: polizas|siniestros|rrhh|legal|operaciones.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 6,
+    "name": "auth-service-backend",
+    "description": "IAuthService en Application con LoginAsync, RefreshAsync, RevokeAsync. Implementación en Infrastructure: BCrypt.Verify, JWT HS256 con claims (sub, email, roles[], knowledge_bases[], exp+60min), refreshToken como UUID hasheado guardado en BD con TTL 7 días. Clave JWT desde IConfiguration.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 7,
+    "name": "auth-controller-endpoints",
+    "description": "AuthController con POST /api/auth/login (200 o 401 mensaje genérico), POST /api/auth/refresh (200 o 401), POST /api/auth/logout ([Authorize], 204). Rate limiting en login: máx 5 intentos por IP por minuto con .NET 8 built-in rate limiter.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  },
+  {
+    "id": 8,
+    "name": "jwt-middleware-setup",
+    "description": "Configurar Program.cs: AddAuthentication JwtBearer (ValidateIssuerSigningKey, ValidateLifetime, ClockSkew=0), AddAuthorization, UseAuthentication + UseAuthorization antes de MapControllers, CORS para Angular (desde config), Jwt:Secret en appsettings.Development.json, registro DI de IAuthService.",
+    "status": "pending",
+    "sdd": true,
+    "completed_at": null
+  }
+]
