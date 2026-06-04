@@ -2,10 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from 'core';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +20,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly showPassword = signal(false);
   readonly isLoading = signal(false);
@@ -60,21 +67,34 @@ export class LoginComponent {
     return '';
   }
 
-  async onSubmit(): Promise<void> {
-    console.log('console.log(form.value);');
+  onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
     this.isLoading.set(true);
     this.loginError.set(null);
-    try {
-      await new Promise<void>((resolve) => setTimeout(resolve, 1800));
-      this.loginSuccess.set(true);
-    } catch {
-      this.loginError.set('Credenciales inválidas. Por favor, intenta de nuevo.');
-    } finally {
-      this.isLoading.set(false);
-    }
+    const email = this.form.get('email')!.value;
+    const password = this.form.get('password')!.value;
+
+    this.authService
+      .signIn(email, password)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.loginSuccess.set(true);
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.loginError.set('Credenciales inválidas. Por favor, intenta de nuevo.');
+          }
+        },
+        error: () => {
+          this.loginError.set('Ocurrió un error. Por favor, intenta de nuevo.');
+        },
+        complete: () => {
+          this.isLoading.set(false);
+        },
+      });
   }
 }
