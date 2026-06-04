@@ -1,13 +1,122 @@
-import { Injectable } from '@angular/core';
-import { delay, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { map, Observable, tap } from 'rxjs';
+
+interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+interface JwtPayload {
+  exp?: number;
+  roles?: string[] | string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  
-  public signIn(email: string, password: string): Observable<{ success: boolean }>  {
-    sessionStorage.setItem('authToken', 'fake-jwt-token');
-    return of({ success: true }).pipe(delay(1000));
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly accessKey = 'sn_access_token';
+  private readonly refreshKey = 'sn_refresh_token';
+
+  signIn(email: string, password: string): Observable<void> {
+    return this.http.post<LoginResponse>('/api/auth/login', { email, password }).pipe(
+      tap((tokens) => this.storeTokens(tokens.access_token, tokens.refresh_token)),
+      map(() => undefined)
+    );
+  }
+
+  refreshToken(): Observable<string> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error('Missing refresh token.');
+    }
+
+    return this.http
+      .post<LoginResponse>('/api/auth/refresh', { refresh_token: refreshToken })
+      .pipe(
+        tap((tokens) => this.storeTokens(tokens.access_token, tokens.refresh_token)),
+        map((tokens) => tokens.access_token)
+      );
+  }
+
+  signOut(): void {
+    localStorage.removeItem(this.accessKey);
+    localStorage.removeItem(this.refreshKey);
+    this.router.navigate(['/login']);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.accessKey);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.refreshKey);
+  }
+
+  isTokenExpired(token: string | null): boolean {
+    if (!token) {
+      return true;
+    }
+
+    const payload = this.decodeToken(token);
+    if (!payload?.exp) {
+      return true;
+    }
+
+    return payload.exp * 1000 <= Date.now();
+  }
+
+  resolvePostLoginRoute(): string {
+    const payload = this.decodeToken(this.getAccessToken());
+    const roles = this.normalizeRoles(payload?.roles);
+    if (roles.includes('admin_ti')) {
+      return '/admin';
+    }
+
+    return roles.includes('agente_siniestros') || roles.includes('empleado') ? '/chat' : '/login';
+  }
+
+  private storeTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(this.accessKey, accessToken);
+    localStorage.setItem(this.refreshKey, refreshToken);
+  }
+
+  private decodeToken(token: string | null): JwtPayload | null {
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const [, payloadBase64] = token.split('.');
+      if (!payloadBase64) {
+        return null;
+      }
+
+      return JSON.parse(atob(payloadBase64)) as JwtPayload;
+    } catch {
+      return null;
+    }
+  }
+
+  private normalizeRoles(roles: string[] | string | undefined): string[] {
+    if (!roles) {
+      return [];
+    }
+
+    if (Array.isArray(roles)) {
+      return roles;
+    }
+
+    try {
+      return JSON.parse(roles) as string[];
+    } catch {
+      return [roles];
+    }
   }
 }

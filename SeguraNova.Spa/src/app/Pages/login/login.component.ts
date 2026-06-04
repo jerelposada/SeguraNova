@@ -48,11 +48,6 @@ export class LoginComponent {
     return !!(control?.invalid && (control?.dirty || control?.touched));
   }
 
-  // isFieldValid(field: string): boolean {
-  //   const control = this.form.get(field);
-  //   return !!(control?.valid && (control?.dirty || control?.touched));
-  // }
-
   getEmailError(): string {
     const control = this.form.get('email');
     if (control?.hasError('required')) return 'El email es requerido';
@@ -81,13 +76,9 @@ export class LoginComponent {
       .signIn(email, password)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loginSuccess.set(true);
-            this.router.navigate(['/dashboard']);
-          } else {
-            this.loginError.set('Credenciales inválidas. Por favor, intenta de nuevo.');
-          }
+        next: () => {
+          this.loginSuccess.set(true);
+          this.router.navigate([this.authService.resolvePostLoginRoute()]);
         },
         error: () => {
           this.loginError.set('Ocurrió un error. Por favor, intenta de nuevo.');

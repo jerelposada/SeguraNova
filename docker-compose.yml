@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: seguranova-postgres
+    environment:
+      POSTGRES_DB: seguranova_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - seguranova_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d seguranova_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    container_name: seguranova-api
+    build:
+      context: ./SeguroNova.Api
+      dockerfile: src/API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=seguranova_dev;Username=postgres;Password=postgres
+      Jwt__Issuer: SeguraNova.Api
+      Jwt__Audience: SeguraNova.Spa
+      Jwt__Secret: seguranova_dev_secret_key_please_change_2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5132:8080"
+
+  spa:
+    container_name: seguranova-spa
+    build:
+      context: ./SeguraNova.Spa
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "4200:80"
+
+  pgadmin:
+    image: dpage/pgadmin4:8.9
+    container_name: seguranova-pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@seguranova.dev
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - seguranova_pgadmin_data:/var/lib/pgadmin
+      - ./infra/pgadmin/servers.json:/pgadmin4/servers.json:ro
+
+volumes:
+  seguranova_postgres_data:
+  seguranova_pgadmin_data:
