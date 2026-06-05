@@ -1,12 +1,87 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Back\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2E19F7A0-8D3E-4874-AC3B-CA270EF62E11}|src\\API\\API.csproj|c:\\users\\jerelposadamejias\\documents\\seguranova\\seguronova.api\\src\\api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2E19F7A0-8D3E-4874-AC3B-CA270EF62E11}|src\\API\\API.csproj|solutionrelative:src\\api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14C14532-5467-4A94-B50F-348A04EB79D8}|tests\\API.Tests\\API.Tests.csproj|c:\\users\\jerelposadamejias\\documents\\seguranova\\seguronova.api\\tests\\api.tests\\auth\\jwtconfigurationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14C14532-5467-4A94-B50F-348A04EB79D8}|tests\\API.Tests\\API.Tests.csproj|solutionrelative:tests\\api.tests\\auth\\jwtconfigurationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14C14532-5467-4A94-B50F-348A04EB79D8}|tests\\API.Tests\\API.Tests.csproj|c:\\users\\jerelposadamejias\\documents\\seguranova\\seguronova.api\\tests\\api.tests\\auth\\customapifactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14C14532-5467-4A94-B50F-348A04EB79D8}|tests\\API.Tests\\API.Tests.csproj|solutionrelative:tests\\api.tests\\auth\\customapifactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguraNova.Spa\\.vscode\\settings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\src\\API\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "src\\API\\Controllers\\AuthController.cs",
+              "ToolTip": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\src\\API\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "src\\API\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T22:29:04.788Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "JwtConfigurationTests.cs",
+              "DocumentMoniker": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\tests\\API.Tests\\Auth\\JwtConfigurationTests.cs",
+              "RelativeDocumentMoniker": "tests\\API.Tests\\Auth\\JwtConfigurationTests.cs",
+              "ToolTip": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\tests\\API.Tests\\Auth\\JwtConfigurationTests.cs",
+              "RelativeToolTip": "tests\\API.Tests\\Auth\\JwtConfigurationTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T22:28:57.08Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CustomApiFactory.cs",
+              "DocumentMoniker": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\tests\\API.Tests\\Auth\\CustomApiFactory.cs",
+              "RelativeDocumentMoniker": "tests\\API.Tests\\Auth\\CustomApiFactory.cs",
+              "ToolTip": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguroNova.Api\\tests\\API.Tests\\Auth\\CustomApiFactory.cs",
+              "RelativeToolTip": "tests\\API.Tests\\Auth\\CustomApiFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T22:28:55.404Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "settings.json",
+              "DocumentMoniker": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguraNova.Spa\\.vscode\\settings.json",
+              "RelativeDocumentMoniker": "..\\SeguraNova.Spa\\.vscode\\settings.json",
+              "ToolTip": "C:\\Users\\JerelPosadaMejias\\Documents\\SeguraNova\\SeguraNova.Spa\\.vscode\\settings.json",
+              "RelativeToolTip": "..\\SeguraNova.Spa\\.vscode\\settings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-06-04T17:38:54.596Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
