@@ -35,17 +35,17 @@ public class AuthContractsTests
 
         Assert.Contains(methods, m =>
             m.Name == "LoginAsync" &&
-            m.ReturnType == typeof(Task<AuthTokensResponse>) &&
+            m.ReturnType == typeof(Task<AuthTokensResponse?>) &&
             HasParameters(m, typeof(LoginRequest), typeof(CancellationToken)));
 
         Assert.Contains(methods, m =>
             m.Name == "RefreshAsync" &&
-            m.ReturnType == typeof(Task<AuthTokensResponse>) &&
-            HasParameters(m, typeof(string), typeof(CancellationToken)));
+            m.ReturnType == typeof(Task<AuthTokensResponse?>) &&
+            HasParameters(m, typeof(RefreshRequest), typeof(CancellationToken)));
 
         Assert.Contains(methods, m =>
             m.Name == "RevokeAsync" &&
-            m.ReturnType == typeof(Task) &&
+            m.ReturnType == typeof(Task<bool>) &&
             HasParameters(m, typeof(Guid), typeof(string), typeof(CancellationToken)));
     }
 

@@ -23,6 +23,7 @@ builder.Services.AddSingleton<IAccessTokenGenerator, JwtAccessTokenGenerator>();
 builder.Services.AddSingleton<ISystemClock, SystemClock>();
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+var seedOptions = builder.Configuration.GetSection(AuthSeedOptions.SectionName).Get<AuthSeedOptions>() ?? new AuthSeedOptions();
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -59,22 +60,20 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await DatabaseInitialization.InitializeAsync(dbContext, seedOptions, CancellationToken.None);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    // This project currently has no EF Core migrations; ensure schema exists for local/dev runs.
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.EnsureCreated();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 app.UseAuthentication();

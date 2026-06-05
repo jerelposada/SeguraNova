@@ -49,7 +49,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     private static void ConfigureKnowledgeBase(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<UserKnowledgeBase> builder)
     {
         builder.HasKey(x => new { x.UserId, x.KnowledgeBase });
-        builder.Property(x => x.KnowledgeBase).HasMaxLength(128).IsRequired();
+        builder.Property(x => x.KnowledgeBase).HasConversion<string>().HasMaxLength(32).IsRequired();
         builder.HasOne(x => x.User).WithMany(x => x.KnowledgeBases).HasForeignKey(x => x.UserId);
     }
 

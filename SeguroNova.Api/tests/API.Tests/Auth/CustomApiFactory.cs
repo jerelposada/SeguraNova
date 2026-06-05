@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -58,7 +59,7 @@ public sealed class CustomApiFactory : WebApplicationFactory<Program>
         });
         context.Roles.Add(new Role { Id = roleId, Name = "agente_siniestros" });
         context.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleId });
-        context.UserKnowledgeBases.Add(new UserKnowledgeBase { UserId = userId, KnowledgeBase = "general" });
+        context.UserKnowledgeBases.Add(new UserKnowledgeBase { UserId = userId, KnowledgeBase = KnowledgeBase.siniestros });
         context.SaveChanges();
     }
 }

@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from 'core';
 
 @Component({
@@ -63,29 +64,49 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.shouldAbortSubmit()) {
       return;
     }
-    this.isLoading.set(true);
-    this.loginError.set(null);
-    const email = this.form.get('email')!.value;
-    const password = this.form.get('password')!.value;
+
+    this.prepareSubmitState();
+    const { email, password } = this.getCredentials();
 
     this.authService
       .signIn(email, password)
+      .pipe(finalize(() => this.isLoading.set(false)))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          this.loginSuccess.set(true);
-          this.router.navigate([this.authService.resolvePostLoginRoute()]);
-        },
-        error: () => {
-          this.loginError.set('Ocurrió un error. Por favor, intenta de nuevo.');
-        },
-        complete: () => {
-          this.isLoading.set(false);
-        },
+        next: () => this.handleLoginSuccess(),
+        error: () => this.handleLoginError(),
       });
+  }
+
+  private shouldAbortSubmit(): boolean {
+    if (!this.form.invalid) {
+      return false;
+    }
+
+    this.form.markAllAsTouched();
+    return true;
+  }
+
+  private prepareSubmitState(): void {
+    this.isLoading.set(true);
+    this.loginError.set(null);
+  }
+
+  private getCredentials(): { email: string; password: string } {
+    const email = this.form.get('email')!.value;
+    const password = this.form.get('password')!.value;
+    return { email, password };
+  }
+
+  private handleLoginSuccess(): void {
+    this.loginSuccess.set(true);
+    this.router.navigate([this.authService.resolvePostLoginRoute()]);
+  }
+
+  private handleLoginError(): void {
+    this.loginError.set('Ocurrió un error. Por favor, intenta de nuevo.');
   }
 }

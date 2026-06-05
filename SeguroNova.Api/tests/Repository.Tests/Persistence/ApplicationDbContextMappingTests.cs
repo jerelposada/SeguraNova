@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Repository.Persistence;
@@ -17,7 +18,7 @@ public sealed class ApplicationDbContextMappingTests
         context.Users.Add(user);
         context.Roles.Add(role);
         context.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id });
-        context.UserKnowledgeBases.Add(new UserKnowledgeBase { UserId = user.Id, KnowledgeBase = "claims" });
+        context.UserKnowledgeBases.Add(new UserKnowledgeBase { UserId = user.Id, KnowledgeBase = KnowledgeBase.siniestros });
         await context.SaveChangesAsync();
 
         var loadedUser = await context.Users
@@ -29,7 +30,7 @@ public sealed class ApplicationDbContextMappingTests
         Assert.Single(loadedUser.UserRoles);
         Assert.Equal("agente_siniestros", loadedUser.UserRoles[0].Role.Name);
         Assert.Single(loadedUser.KnowledgeBases);
-        Assert.Equal("claims", loadedUser.KnowledgeBases[0].KnowledgeBase);
+        Assert.Equal(KnowledgeBase.siniestros, loadedUser.KnowledgeBases[0].KnowledgeBase);
     }
 
     [Fact]

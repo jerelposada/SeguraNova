@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { AuthService } from 'core';
 import { authInterceptor } from './auth.interceptor';
 
@@ -84,5 +84,53 @@ describe('authInterceptor', () => {
     first.flush({}, { status: 401, statusText: 'Unauthorized' });
 
     expect(authService.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  it('should coalesce concurrent 401 responses into a single refresh call', () => {
+    const refreshSubject = new Subject<string>();
+    authService.refreshToken.and.returnValue(refreshSubject.asObservable());
+
+    httpClient.get('/api/cases/1').subscribe();
+    httpClient.get('/api/cases/2').subscribe();
+
+    const first = httpMock.expectOne('/api/cases/1');
+    const second = httpMock.expectOne('/api/cases/2');
+    first.flush({}, { status: 401, statusText: 'Unauthorized' });
+    second.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(authService.refreshToken).toHaveBeenCalledTimes(1);
+
+    refreshSubject.next('shared-token');
+    refreshSubject.complete();
+
+    const retriedFirst = httpMock.expectOne('/api/cases/1');
+    const retriedSecond = httpMock.expectOne('/api/cases/2');
+
+    expect(retriedFirst.request.headers.get('Authorization')).toBe('Bearer shared-token');
+    expect(retriedSecond.request.headers.get('Authorization')).toBe('Bearer shared-token');
+
+    retriedFirst.flush({ ok: true });
+    retriedSecond.flush({ ok: true });
+  });
+
+  it('should not loop refresh when retried request returns 401 again', () => {
+    let capturedStatus = 0;
+
+    httpClient.get('/api/cases').subscribe({
+      error: (error) => {
+        capturedStatus = error.status;
+      },
+    });
+
+    const first = httpMock.expectOne('/api/cases');
+    first.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    const retried = httpMock.expectOne('/api/cases');
+    expect(retried.request.headers.get('X-Refresh-Retry')).toBe('1');
+    retried.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    expect(authService.refreshToken).toHaveBeenCalledTimes(1);
+    expect(authService.signOut).not.toHaveBeenCalled();
+    expect(capturedStatus).toBe(401);
   });
 });

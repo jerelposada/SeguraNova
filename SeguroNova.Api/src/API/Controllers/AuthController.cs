@@ -15,29 +15,25 @@ public sealed class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        try
-        {
-            var response = await authService.LoginAsync(request, ct);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException)
+        var response = await authService.LoginAsync(request, ct);
+        if (response is null)
         {
             return Unauthorized(new { message = "Invalid credentials." });
         }
+
+        return Ok(response);
     }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request, CancellationToken ct)
     {
-        try
-        {
-            var response = await authService.RefreshAsync(request.RefreshToken, ct);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException)
+        var response = await authService.RefreshAsync(request, ct);
+        if (response is null)
         {
             return Unauthorized(new { message = "Invalid credentials." });
         }
+
+        return Ok(response);
     }
 
     [Authorize]

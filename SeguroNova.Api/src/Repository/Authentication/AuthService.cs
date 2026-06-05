@@ -11,22 +11,20 @@ public sealed class AuthService(
     IAccessTokenGenerator accessTokenGenerator,
     ISystemClock clock) : IAuthService
 {
-    private const string InvalidCredentialsMessage = "Invalid credentials.";
-
-    public async Task<AuthTokensResponse> LoginAsync(LoginRequest request, CancellationToken ct)
+    public async Task<AuthTokensResponse?> LoginAsync(LoginRequest request, CancellationToken ct)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
         var user = await LoadUserByEmailAsync(normalizedEmail, ct);
         var credentialsValid = user is not null && BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
         if (!credentialsValid)
         {
-            throw new UnauthorizedAccessException(InvalidCredentialsMessage);
+            return null;
         }
 
         return await IssueTokenPairAsync(user!, ct);
     }
 
-    public async Task<AuthTokensResponse> RefreshAsync(string refreshToken, CancellationToken ct)
+    public async Task<AuthTokensResponse?> RefreshAsync(RefreshRequest request, CancellationToken ct)
     {
         var now = clock.UtcNow;
         var tokens = await dbContext.RefreshTokens.Include(x => x.User)
@@ -36,10 +34,10 @@ public sealed class AuthService(
             .Where(x => !x.IsRevoked && x.ExpiresAtUtc > now)
             .ToListAsync(ct);
 
-        var match = tokens.FirstOrDefault(x => BCrypt.Net.BCrypt.Verify(refreshToken, x.TokenHash));
+        var match = tokens.FirstOrDefault(x => BCrypt.Net.BCrypt.Verify(request.RefreshToken, x.TokenHash));
         if (match is null)
         {
-            throw new UnauthorizedAccessException(InvalidCredentialsMessage);
+            return null;
         }
 
         match.IsRevoked = true;
@@ -47,23 +45,26 @@ public sealed class AuthService(
         return await IssueTokenPairAsync(match.User, ct);
     }
 
-    public async Task RevokeAsync(Guid userId, string refreshToken, CancellationToken ct)
+    public async Task<bool> RevokeAsync(Guid userId, string refreshToken, CancellationToken ct)
     {
         var activeTokens = await dbContext.RefreshTokens
             .Where(x => x.UserId == userId && !x.IsRevoked)
             .ToListAsync(ct);
 
         var now = clock.UtcNow;
+        var revoked = false;
         foreach (var token in activeTokens)
         {
             if (BCrypt.Net.BCrypt.Verify(refreshToken, token.TokenHash))
             {
                 token.IsRevoked = true;
                 token.RevokedAtUtc = now;
+                revoked = true;
             }
         }
 
         await dbContext.SaveChangesAsync(ct);
+        return revoked;
     }
 
     private async Task<User?> LoadUserByEmailAsync(string normalizedEmail, CancellationToken ct)
@@ -79,7 +80,7 @@ public sealed class AuthService(
     {
         var now = clock.UtcNow;
         var roles = user.UserRoles.Select(x => x.Role.Name).ToList();
-        var knowledgeBases = user.KnowledgeBases.Select(x => x.KnowledgeBase).ToList();
+        var knowledgeBases = user.KnowledgeBases.Select(x => x.KnowledgeBase.ToString()).ToList();
         var accessToken = accessTokenGenerator.Generate(user, roles, knowledgeBases, now);
         var refreshToken = Convert.ToBase64String(Guid.NewGuid().ToByteArray()) + Guid.NewGuid().ToString("N");
         var refreshEntity = new RefreshToken

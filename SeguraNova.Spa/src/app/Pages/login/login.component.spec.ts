@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from 'core';
 import { LoginComponent } from './login.component';
@@ -64,5 +64,22 @@ describe('LoginComponent', () => {
 
     expect(authServiceMock.signIn).toHaveBeenCalledWith('empleado@seguranova.local', 'secret123');
     expect(routerMock.navigate).toHaveBeenCalledWith(['/chat']);
+  });
+
+  it('should stop loading and set login error when signIn fails', () => {
+    authServiceMock.signIn.and.returnValue(throwError(() => new Error('login failed')));
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    const component = fixture.componentInstance;
+    component.form.setValue({
+      email: 'empleado@seguranova.local',
+      password: 'secret123',
+      rememberMe: false,
+    });
+
+    component.onSubmit();
+
+    expect(component.isLoading()).toBeFalse();
+    expect(component.loginError()).toBe('Ocurrió un error. Por favor, intenta de nuevo.');
   });
 });

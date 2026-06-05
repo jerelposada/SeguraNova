@@ -39,6 +39,18 @@ describe('authGuard', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
+  it('R4: should decode JWT payload with atob when evaluating expiration', () => {
+    const token = createToken(pastExp());
+    const [, payloadBase64] = token.split('.');
+    const atobSpy = spyOn(window, 'atob').and.callThrough();
+    authService.getAccessToken.and.returnValue(token);
+
+    const canActivate = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
+
+    expect(canActivate).toBeFalse();
+    expect(atobSpy).toHaveBeenCalledWith(payloadBase64);
+  });
+
   it('should allow access when token is valid', () => {
     authService.getAccessToken.and.returnValue(createToken(futureExp()));
 
@@ -46,6 +58,15 @@ describe('authGuard', () => {
 
     expect(canActivate).toBeTrue();
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('should redirect to login when token is malformed', () => {
+    authService.getAccessToken.and.returnValue('malformed-token');
+
+    const canActivate = TestBed.runInInjectionContext(() => authGuard({} as never, {} as never));
+
+    expect(canActivate).toBeFalse();
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
   function createToken(exp: number): string {

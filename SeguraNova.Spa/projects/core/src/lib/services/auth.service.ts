@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, tap, throwError } from 'rxjs';
 
 interface LoginResponse {
   access_token: string;
@@ -23,10 +23,11 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly accessKey = 'sn_access_token';
   private readonly refreshKey = 'sn_refresh_token';
+  private readonly missingRefreshTokenMessage = 'Missing refresh token.';
 
   signIn(email: string, password: string): Observable<void> {
     return this.http.post<LoginResponse>('/api/auth/login', { email, password }).pipe(
-      tap((tokens) => this.storeTokens(tokens.access_token, tokens.refresh_token)),
+      tap((tokens) => this.persistTokens(tokens)),
       map(() => undefined)
     );
   }
@@ -34,13 +35,13 @@ export class AuthService {
   refreshToken(): Observable<string> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
-      throw new Error('Missing refresh token.');
+      return throwError(() => new Error(this.missingRefreshTokenMessage));
     }
 
     return this.http
       .post<LoginResponse>('/api/auth/refresh', { refresh_token: refreshToken })
       .pipe(
-        tap((tokens) => this.storeTokens(tokens.access_token, tokens.refresh_token)),
+        tap((tokens) => this.persistTokens(tokens)),
         map((tokens) => tokens.access_token)
       );
   }
@@ -87,6 +88,10 @@ export class AuthService {
     localStorage.setItem(this.refreshKey, refreshToken);
   }
 
+  private persistTokens(tokens: LoginResponse): void {
+    this.storeTokens(tokens.access_token, tokens.refresh_token);
+  }
+
   private decodeToken(token: string | null): JwtPayload | null {
     if (!token) {
       return null;
@@ -114,7 +119,8 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(roles) as string[];
+      const parsed = JSON.parse(roles) as unknown;
+      return Array.isArray(parsed) ? parsed.filter((role): role is string => typeof role === 'string') : [];
     } catch {
       return [roles];
     }
