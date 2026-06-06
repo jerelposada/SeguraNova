@@ -1,3 +1,64 @@
 :host {
   display: block;
 }
+
+.dashboard {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.dashboard__header {
+  background: var(--clr-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-inset-xs);
+  display: grid;
+  gap: 4px;
+  padding: var(--sp-2);
+}
+
+.dashboard__eyebrow {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.dashboard__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-xl);
+}
+
+.dashboard__status {
+  color: var(--clr-body);
+  font-size: var(--fs-sm);
+}
+
+.dashboard__kpis {
+  display: grid;
+  gap: var(--sp-2);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.dashboard__kpi-card {
+  background: var(--clr-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--neu-xs);
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-2);
+}
+
+.dashboard__kpi-label,
+.dashboard__kpi-trend {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.dashboard__kpi-value {
+  color: var(--clr-heading);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+}
+
+.dashboard__sections {
+  display: grid;
+  gap: var(--sp-2);
+}

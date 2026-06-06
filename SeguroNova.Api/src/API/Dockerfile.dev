@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+WORKDIR /src
+
+COPY src/API/API.csproj src/API/
+COPY src/Application/Application.csproj src/Application/
+COPY src/Domain/Domain.csproj src/Domain/
+COPY src/Repository/Repository.csproj src/Repository/
+RUN dotnet restore src/API/API.csproj
+
+COPY . .
+EXPOSE 8080
+CMD ["dotnet", "watch", "--project", "src/API/API.csproj", "run", "--urls", "http://0.0.0.0:8080"]

@@ -1,0 +1,37 @@
+<section class="upload-card" data-testid="upload-region">
+  <div class="upload-card__header">
+    <div>
+      <p class="upload-card__eyebrow">Carga simulada</p>
+      <h3 class="upload-card__title">Carga de documentos</h3>
+    </div>
+
+    <button class="upload-card__cta" data-testid="upload-cta" type="button">
+      Subir documento
+    </button>
+  </div>
+
+  <div class="upload-dropzone" data-testid="upload-dropzone">
+    <p class="upload-dropzone__title">Arrastra archivos aquí o selecciónalos manualmente</p>
+    <p class="upload-dropzone__hint">PDF, DOCX y plantillas internas con ingestión simulada.</p>
+  </div>
+
+  <div class="upload-queue">
+    <div class="upload-queue__header">
+      <h4 class="upload-queue__title">Cola actual</h4>
+      <span class="upload-queue__count">{{ queueItems().length }} archivos</span>
+    </div>
+
+    <div class="upload-queue__list">
+      @for (item of queueItems(); track item.id) {
+        <article class="upload-item">
+          <div>
+            <p class="upload-item__name">{{ item.nombre }}</p>
+            <p class="upload-item__meta">Pipeline documental</p>
+          </div>
+
+          <span class="upload-item__status">{{ item.estado }}</span>
+        </article>
+      }
+    </div>
+  </div>
+</section>

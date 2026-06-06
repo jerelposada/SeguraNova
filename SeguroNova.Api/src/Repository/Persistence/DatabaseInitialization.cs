@@ -8,19 +8,7 @@ public static class DatabaseInitialization
 {
     public static async Task InitializeAsync(ApplicationDbContext context, AuthSeedOptions options, CancellationToken ct)
     {
-        var providerName = context.Database.ProviderName ?? string.Empty;
-        if (providerName.Contains("Sqlite", StringComparison.OrdinalIgnoreCase))
-        {
-            await context.Database.EnsureCreatedAsync(ct);
-        }
-        else if (context.Database.GetMigrations().Any())
-        {
-            await context.Database.MigrateAsync(ct);
-        }
-        else
-        {
-            await context.Database.EnsureCreatedAsync(ct);
-        }
+        await context.Database.EnsureCreatedAsync(ct);
 
         var role = await EnsureRoleAsync(context, options, ct);
         var admin = await EnsureAdminAsync(context, options, ct);

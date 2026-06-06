@@ -1,0 +1,39 @@
+@if (isOpen()) {
+  <section class="chunk-preview" data-testid="chunk-preview-surface">
+    <div class="chunk-preview__header">
+      <div>
+        <p class="chunk-preview__eyebrow">Chunk preview</p>
+        <h3 class="chunk-preview__title">Fragmentacion simulada</h3>
+      </div>
+
+      <button class="chunk-preview__close" data-testid="close-preview" type="button" (click)="onClose()">
+        Cerrar
+      </button>
+    </div>
+
+    @if (document(); as activeDocument) {
+      @if (version(); as activeVersion) {
+        <div class="chunk-preview__meta">
+          <p class="chunk-preview__document">{{ activeDocument.nombre }}</p>
+          <p class="chunk-preview__detail">{{ activeVersion.version }} · {{ activeVersion.estado }}</p>
+        </div>
+
+        <div class="chunk-preview__list">
+          @for (chunk of chunks(); track chunk.id) {
+            <article class="chunk-item">
+              <div class="chunk-item__header">
+                <p class="chunk-item__title">{{ chunk.encabezado }}</p>
+                <span class="chunk-item__score" data-testid="chunk-score-badge" [attr.data-score]="chunk.score">
+                  {{ chunk.score }}
+                </span>
+              </div>
+
+              <p class="chunk-item__content">{{ chunk.contenido }}</p>
+              <p class="chunk-item__meta">Pagina {{ chunk.pagina }} · {{ chunk.longitud }} caracteres</p>
+            </article>
+          }
+        </div>
+      }
+    }
+  </section>
+}

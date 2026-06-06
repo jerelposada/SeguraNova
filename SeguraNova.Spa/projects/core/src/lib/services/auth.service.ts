@@ -25,14 +25,14 @@ export class AuthService {
   private readonly refreshKey = 'sn_refresh_token';
   private readonly missingRefreshTokenMessage = 'Missing refresh token.';
 
-  signIn(email: string, password: string): Observable<void> {
+ public signIn(email: string, password: string): Observable<void> {
     return this.http.post<LoginResponse>('/api/auth/login', { email, password }).pipe(
       tap((tokens) => this.persistTokens(tokens)),
       map(() => undefined)
     );
   }
 
-  refreshToken(): Observable<string> {
+  public refreshToken(): Observable<string> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
       return throwError(() => new Error(this.missingRefreshTokenMessage));
@@ -46,21 +46,21 @@ export class AuthService {
       );
   }
 
-  signOut(): void {
+  public signOut(): void {
     localStorage.removeItem(this.accessKey);
     localStorage.removeItem(this.refreshKey);
     this.router.navigate(['/login']);
   }
 
-  getAccessToken(): string | null {
+  public getAccessToken(): string | null {
     return localStorage.getItem(this.accessKey);
   }
 
-  getRefreshToken(): string | null {
+  public getRefreshToken(): string | null {
     return localStorage.getItem(this.refreshKey);
   }
 
-  isTokenExpired(token: string | null): boolean {
+  public isTokenExpired(token: string | null): boolean {
     if (!token) {
       return true;
     }
@@ -73,7 +73,7 @@ export class AuthService {
     return payload.exp * 1000 <= Date.now();
   }
 
-  resolvePostLoginRoute(): string {
+  public resolvePostLoginRoute(): string {
     const payload = this.decodeToken(this.getAccessToken());
     const roles = this.normalizeRoles(payload?.roles);
     if (roles.includes('admin_ti')) {

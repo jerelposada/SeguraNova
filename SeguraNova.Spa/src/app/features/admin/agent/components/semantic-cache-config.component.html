@@ -1,0 +1,55 @@
+<section class="cache-card" data-testid="semantic-cache-region">
+  <header class="cache-card__header">
+    <h3 class="cache-card__title">Semantic cache</h3>
+    <p class="cache-card__subtitle">Ajustes locales para similitud, TTL y capacidad.</p>
+  </header>
+
+  <label class="cache-card__switch">
+    <span>Habilitar cache</span>
+    <input
+      data-testid="cache-enabled"
+      type="checkbox"
+      [checked]="localSettings().enabled"
+      (change)="onEnabledChange($any($event.target).checked)"
+    />
+  </label>
+
+  <label class="cache-card__field">
+    <span>Min similarity</span>
+    <input
+      data-testid="cache-min-similarity"
+      type="number"
+      min="0.5"
+      max="1"
+      step="0.01"
+      [value]="localSettings().minSimilarity"
+      (input)="onSimilarityChange(+$any($event.target).value)"
+    />
+  </label>
+
+  <label class="cache-card__field">
+    <span>TTL (minutos)</span>
+    <input
+      type="range"
+      min="15"
+      max="180"
+      step="5"
+      [value]="localSettings().ttlMinutes"
+      (input)="onTtlChange(+$any($event.target).value)"
+    />
+  </label>
+
+  <label class="cache-card__field">
+    <span>Max entries</span>
+    <input
+      type="range"
+      min="200"
+      max="5000"
+      step="100"
+      [value]="localSettings().maxEntries"
+      (input)="onMaxEntriesChange(+$any($event.target).value)"
+    />
+  </label>
+
+  <p class="cache-card__summary" data-testid="cache-summary">{{ summary() }}</p>
+</section>

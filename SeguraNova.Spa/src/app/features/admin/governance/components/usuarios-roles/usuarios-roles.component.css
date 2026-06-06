@@ -1,0 +1,123 @@
+.users-card {
+  background: var(--clr-surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-sm);
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-2);
+}
+
+.users-card__title,
+.users-row__name,
+.users-modal__title {
+  color: var(--clr-heading);
+}
+
+.users-card__title {
+  font-size: var(--fs-lg);
+}
+
+.users-card__subtitle,
+.users-row__mail,
+.users-modal__text,
+.users-card__empty {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.users-card__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.users-chip {
+  background: var(--clr-bg);
+  border: 0;
+  border-radius: var(--r-pill);
+  box-shadow: var(--neu-xs);
+  color: var(--clr-body);
+  padding: 6px 12px;
+}
+
+.users-chip--active {
+  background: var(--clr-primary-ultra);
+  color: var(--clr-primary-active);
+}
+
+.users-table {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.users-row {
+  align-items: center;
+  background: var(--clr-bg);
+  border-radius: var(--r-md);
+  display: flex;
+  gap: var(--sp-1);
+  justify-content: space-between;
+  padding: var(--sp-1);
+}
+
+.users-row__meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.users-role,
+.users-status {
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  padding: 2px 8px;
+}
+
+.users-role {
+  background: var(--clr-primary-ultra);
+  color: var(--clr-primary-active);
+}
+
+.users-status {
+  background: var(--clr-success-bg);
+  color: var(--clr-success);
+}
+
+.users-row__button,
+.users-modal__close {
+  background: var(--clr-primary);
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--clr-on-primary);
+  font-size: var(--fs-xs);
+  padding: 6px 10px;
+}
+
+.users-modal {
+  align-items: center;
+  background: rgb(30 27 75 / 16%);
+  border-radius: var(--r-md);
+  display: grid;
+  inset: 0;
+  justify-items: center;
+  padding: var(--sp-2);
+}
+
+.users-modal__content {
+  background: var(--clr-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--neu-sm);
+  display: grid;
+  gap: 6px;
+  max-width: 360px;
+  padding: var(--sp-2);
+  width: 100%;
+}
+
+@media (max-width: calc(var(--sp-6) * 10)) {
+  .users-row {
+    align-items: start;
+    flex-direction: column;
+  }
+}

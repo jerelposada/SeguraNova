@@ -1,0 +1,47 @@
+<section class="history-card" data-testid="history-region">
+  <header class="history-card__header">
+    <h3 class="history-card__title">Historial de conversaciones</h3>
+    <p class="history-card__subtitle">Vista operativa de calidad y resolucion del agente.</p>
+  </header>
+
+  <div class="history-card__filters" data-testid="conversation-filters">
+    @for (status of statusOptions; track status) {
+      <button
+        type="button"
+        class="history-chip"
+        [attr.data-status-filter]="status"
+        [class.history-chip--active]="activeStatus() === status"
+        (click)="onStatusSelected(status)"
+      >
+        {{ status.replace('_', ' ') }}
+      </button>
+    }
+  </div>
+
+  <div class="history-card__groups" data-testid="conversation-groups">
+    @for (group of groups; track group) {
+      <button
+        type="button"
+        class="history-group"
+        [class.history-group--active]="activeGroup() === group"
+        (click)="onGroupSelected(group)"
+      >
+        {{ group }}
+      </button>
+    }
+  </div>
+
+  <div class="history-card__table">
+    @if (visibleConversations().length > 0) {
+      @for (item of visibleConversations(); track item.id) {
+        <article class="history-row" data-testid="conversation-row">
+          <p class="history-row__question">{{ item.pregunta }}</p>
+          <p class="history-row__meta">{{ item.usuario }} · {{ item.kb }} · {{ item.fecha }}</p>
+          <span class="history-row__status" [attr.data-status]="item.estado">{{ item.estado }}</span>
+        </article>
+      }
+    } @else {
+      <p class="history-card__empty">No hay conversaciones para este filtro.</p>
+    }
+  </div>
+</section>

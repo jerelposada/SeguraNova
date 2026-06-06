@@ -1,0 +1,51 @@
+<section class="metrics-card" data-testid="metricas-uso">
+  <header>
+    <h3 class="metrics-card__title">Metricas de uso</h3>
+    <p class="metrics-card__subtitle">KPIs y tendencia de consultas simuladas.</p>
+  </header>
+
+  <div class="metrics-kpis">
+    @for (kpi of kpis(); track kpi.label) {
+      <article class="metrics-kpi">
+        <p class="metrics-kpi__label">{{ kpi.label }}</p>
+        <p class="metrics-kpi__value">{{ kpi.value }}</p>
+      </article>
+    }
+  </div>
+
+  <div class="metrics-filters">
+    <button
+      type="button"
+      class="metrics-chip"
+      [class.metrics-chip--active]="periodoActivo() === '7d'"
+      data-testid="period-filter"
+      data-periodo="7d"
+      (click)="changePeriodo('7d')"
+    >
+      7d
+    </button>
+    <button
+      type="button"
+      class="metrics-chip"
+      [class.metrics-chip--active]="periodoActivo() === '30d'"
+      data-testid="period-filter"
+      data-periodo="30d"
+      (click)="changePeriodo('30d')"
+    >
+      30d
+    </button>
+  </div>
+
+  <div class="metrics-chart" data-testid="metrics-chart">
+    @for (value of serieConsultas(); track $index) {
+      <div class="metrics-bar">
+        <span
+          class="metrics-bar__value"
+          [style.height.%]="value"
+          [attr.data-value]="value"
+          data-testid="metric-bar"
+        ></span>
+      </div>
+    }
+  </div>
+</section>

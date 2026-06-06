@@ -1,0 +1,56 @@
+<section class="retrieval-card" data-testid="retrieval-region">
+  <header class="retrieval-card__header">
+    <h3 class="retrieval-card__title">Retrieval effort</h3>
+    <p class="retrieval-card__subtitle">Perfil de recuperación para respuestas del agente.</p>
+  </header>
+
+  <div class="retrieval-card__presets">
+    @for (preset of presets; track preset) {
+      <button
+        type="button"
+        class="retrieval-preset"
+        [attr.data-testid]="'retrieval-preset-' + preset"
+        [class.retrieval-preset--active]="localSettings().preset === preset"
+        (click)="onPresetSelected(preset)"
+      >
+        {{ preset }}
+      </button>
+    }
+  </div>
+
+  <label class="retrieval-card__field">
+    <span>Top K</span>
+    <input
+      data-testid="retrieval-topk"
+      type="range"
+      min="3"
+      max="20"
+      step="1"
+      [value]="localSettings().topK"
+      (input)="onTopKChanged(+$any($event.target).value)"
+    />
+  </label>
+
+  <label class="retrieval-card__field">
+    <span>Rerank depth</span>
+    <input
+      type="range"
+      min="10"
+      max="120"
+      step="5"
+      [value]="localSettings().rerankDepth"
+      (input)="onRerankChanged(+$any($event.target).value)"
+    />
+  </label>
+
+  <label class="retrieval-card__field retrieval-card__switch">
+    <span>Include hybrid signals</span>
+    <input
+      type="checkbox"
+      [checked]="localSettings().includeHybridSignals"
+      (change)="onHybridChanged($any($event.target).checked)"
+    />
+  </label>
+
+  <p class="retrieval-card__summary" data-testid="retrieval-summary">{{ summary() }}</p>
+</section>

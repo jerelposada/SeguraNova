@@ -1,0 +1,119 @@
+.upload-card {
+  background: var(--clr-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-inset-xs);
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+}
+
+.upload-card__header {
+  align-items: start;
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: space-between;
+}
+
+.upload-card__eyebrow {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.upload-card__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-xl);
+}
+
+.upload-card__cta {
+  background: var(--clr-primary);
+  border: 0;
+  border-radius: var(--r-pill);
+  color: var(--clr-on-primary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-1) var(--sp-2);
+}
+
+.upload-dropzone {
+  background: var(--clr-surface);
+  border: 1px dashed var(--clr-primary-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-xs);
+  display: grid;
+  gap: var(--sp-1);
+  justify-items: center;
+  padding: var(--sp-4);
+  text-align: center;
+}
+
+.upload-dropzone__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.upload-dropzone__hint {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.upload-queue {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.upload-queue__header {
+  align-items: center;
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: space-between;
+}
+
+.upload-queue__title,
+.upload-item__name {
+  color: var(--clr-heading);
+}
+
+.upload-queue__title {
+  font-size: var(--fs-md);
+}
+
+.upload-queue__count,
+.upload-item__meta {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.upload-queue__list {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.upload-item {
+  align-items: center;
+  background: var(--clr-surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--neu-xs);
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: space-between;
+  padding: var(--sp-2);
+}
+
+.upload-item__status {
+  background: var(--clr-primary-ultra);
+  border-radius: var(--r-pill);
+  color: var(--clr-primary-active);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-1) var(--sp-2);
+}
+
+@media (max-width: calc(var(--sp-6) * 10)) {
+  .upload-card__header,
+  .upload-item,
+  .upload-queue__header {
+    align-items: start;
+    flex-direction: column;
+  }
+}

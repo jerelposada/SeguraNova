@@ -1,0 +1,29 @@
+<section class="agent-shell" data-testid="agent-shell">
+  <header class="agent-shell__header">
+    <h2 class="agent-shell__title">Administracion del agente</h2>
+    <p class="agent-shell__subtitle">Control operativo visual para conversaciones, gaps y retrieval.</p>
+  </header>
+
+  <div class="agent-shell__grid">
+    <app-historial-conversaciones
+      [activeStatus]="activeConversationStatus()"
+      [activeGroup]="$any(activeConversationGroup())"
+      (statusSelected)="onStatusChange($event)"
+      (groupSelected)="onGroupChange($event)"
+    />
+    <app-gap-analysis />
+    <app-semantic-cache-config
+      [settings]="cacheSettings()"
+      (settingsChange)="onCacheSettingsChange($event)"
+    />
+    <app-retrieval-effort
+      [settings]="retrievalSettings()"
+      (settingsChange)="onRetrievalSettingsChange($event)"
+    />
+  </div>
+
+  <p class="agent-shell__state" data-testid="agent-shell-state">
+    Estado shell: {{ activeConversationStatus() }} · grupos {{ activeConversationGroup() }} · cache
+    {{ cacheSettings().enabled ? 'activado' : 'desactivado' }} · {{ retrievalSettings().preset }}
+  </p>
+</section>

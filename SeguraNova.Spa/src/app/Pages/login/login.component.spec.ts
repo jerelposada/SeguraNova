@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { of, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthService } from 'core';
 import { LoginComponent } from './login.component';
@@ -81,5 +82,83 @@ describe('LoginComponent', () => {
 
     expect(component.isLoading()).toBeFalse();
     expect(component.loginError()).toBe('Ocurrió un error. Por favor, intenta de nuevo.');
+  });
+
+  it('should stop loading and allow retry when signIn fails asynchronously', (done) => {
+    // signIn will error on the next macrotask
+    authServiceMock.signIn.and.returnValue(
+      new Observable<void>((subscriber) => {
+        setTimeout(() => subscriber.error(new Error('login async failed')), 0);
+      })
+    );
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    const component = fixture.componentInstance;
+    component.form.setValue({
+      email: 'empleado@seguranova.local',
+      password: 'secret123',
+      rememberMe: false,
+    });
+
+    component.onSubmit();
+
+    // loading should be true immediately after submit
+    expect(component.isLoading()).toBeTrue();
+
+    // wait for async error delivery
+    setTimeout(() => {
+      // after error, loading must be false and error message shown
+      expect(component.isLoading()).toBeFalse();
+      expect(component.loginError()).toBe('Ocurrió un error. Por favor, intenta de nuevo.');
+
+      // allow retry: call onSubmit again and expect signIn called twice
+      component.onSubmit();
+      expect(authServiceMock.signIn).toHaveBeenCalledTimes(2);
+      done();
+    }, 0);
+  });
+
+  it('should render button loading state and revert after signIn error (DOM)', (done) => {
+    // signIn will error on the next macrotask
+    authServiceMock.signIn.and.returnValue(
+      new Observable<void>((subscriber) => {
+        setTimeout(() => subscriber.error(new Error('login async failed')), 0);
+      })
+    );
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    const component = fixture.componentInstance;
+    component.form.setValue({
+      email: 'empleado@seguranova.local',
+      password: 'secret123',
+      rememberMe: false,
+    });
+
+    fixture.detectChanges();
+
+    const btn: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
+
+    // initial state: not loading
+    expect(btn.disabled).toBeFalse();
+    expect(btn.textContent).toContain('Iniciar sesión');
+
+    // submit -> should enter loading state in DOM
+    component.onSubmit();
+    fixture.detectChanges();
+    expect(btn.disabled).toBeTrue();
+    expect(btn.textContent).toContain('Iniciando sesión');
+    expect(fixture.nativeElement.querySelector('.spinner')).not.toBeNull();
+
+    // deliver async error on next macrotask
+    setTimeout(() => {
+      fixture.detectChanges();
+
+      // after error, loading must be removed and button restored
+      expect(component.isLoading()).toBeFalse();
+      expect(btn.disabled).toBeFalse();
+      expect(btn.textContent).toContain('Iniciar sesión');
+      expect(fixture.nativeElement.querySelector('.spinner')).toBeNull();
+      done();
+    }, 0);
   });
 });

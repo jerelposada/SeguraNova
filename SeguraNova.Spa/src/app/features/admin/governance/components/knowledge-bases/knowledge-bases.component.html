@@ -1,0 +1,36 @@
+<section class="kb-card" data-testid="knowledge-bases">
+  <header>
+    <h3 class="kb-card__title">Knowledge bases</h3>
+    <p class="kb-card__subtitle">Cobertura e indexacion simulada por dominio.</p>
+  </header>
+
+  <div class="kb-card__filters">
+    @for (estado of estados(); track estado) {
+      <button
+        type="button"
+        class="kb-chip"
+        [class.kb-chip--active]="estadoFiltro() === estado"
+        [attr.data-estado]="estado"
+        data-testid="kb-filter"
+        (click)="selectEstado(estado)"
+      >
+        {{ estado }}
+      </button>
+    }
+  </div>
+
+  <div class="kb-table">
+    @for (knowledgeBase of filteredKnowledgeBases(); track knowledgeBase.id) {
+      <article class="kb-row" data-testid="kb-row">
+        <p class="kb-row__name">{{ knowledgeBase.nombre }}</p>
+        <p class="kb-row__meta">{{ knowledgeBase.indexacion }}</p>
+        <div class="kb-row__badges">
+          <span class="kb-badge" [attr.data-estado]="knowledgeBase.estado">{{ knowledgeBase.estado }}</span>
+          <span class="kb-badge kb-badge--coverage" data-testid="kb-cobertura">
+            Cobertura {{ knowledgeBase.cobertura }}
+          </span>
+        </div>
+      </article>
+    }
+  </div>
+</section>

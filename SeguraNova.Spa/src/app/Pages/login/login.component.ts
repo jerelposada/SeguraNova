@@ -40,73 +40,76 @@ export class LoginComponent {
     rememberMe: [false],
   });
 
-  togglePassword(): void {
+  public togglePassword(): void {
     this.showPassword.update((v) => !v);
   }
 
-  isFieldInvalid(field: string): boolean {
+  public isFieldInvalid(field: string): boolean {
     const control = this.form.get(field);
     return !!(control?.invalid && (control?.dirty || control?.touched));
   }
 
-  getEmailError(): string {
+  public getEmailError(): string {
     const control = this.form.get('email');
     if (control?.hasError('required')) return 'El email es requerido';
     if (control?.hasError('email')) return 'Ingresa un email válido';
     return '';
   }
 
-  getPasswordError(): string {
+  public getPasswordError(): string {
     const control = this.form.get('password');
     if (control?.hasError('required')) return 'La contraseña es requerida';
     if (control?.hasError('minlength')) return 'Mínimo 8 caracteres requeridos';
     return '';
   }
 
-  onSubmit(): void {
-    if (this.shouldAbortSubmit()) {
-      return;
-    }
+  public onSubmit(): void {
+    if (this.isSubmitBlocked()) return;
 
-    this.prepareSubmitState();
-    const { email, password } = this.getCredentials();
+    this.setSubmittingState();
+    const { email, password } = this.getCredentialsFromForm();
 
-    this.authService
-      .signIn(email, password)
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => this.handleLoginSuccess(),
-        error: () => this.handleLoginError(),
-      });
+    this.submitCredentials(email, password);
   }
 
-  private shouldAbortSubmit(): boolean {
-    if (!this.form.invalid) {
-      return false;
-    }
+  private isSubmitBlocked(): boolean {
+    if (!this.form.invalid) return false;
 
     this.form.markAllAsTouched();
     return true;
   }
 
-  private prepareSubmitState(): void {
+  private setSubmittingState(): void {
     this.isLoading.set(true);
     this.loginError.set(null);
   }
 
-  private getCredentials(): { email: string; password: string } {
+  private getCredentialsFromForm(): { email: string; password: string } {
     const email = this.form.get('email')!.value;
     const password = this.form.get('password')!.value;
     return { email, password };
   }
 
-  private handleLoginSuccess(): void {
+  private submitCredentials(email: string, password: string): void {
+    this.authService
+      .signIn(email, password)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => { this.isLoading.set(false); console.log('Login attempt finalized'); }))
+      .subscribe({
+        next: () => this.onLoginSuccess(),
+        error: () => this.onLoginError(),
+      });
+  }
+
+  private onLoginSuccess(): void {
     this.loginSuccess.set(true);
+    this.isLoading.set(false);
+    console.log('Login successful');
     this.router.navigate([this.authService.resolvePostLoginRoute()]);
   }
 
-  private handleLoginError(): void {
+  private onLoginError(): void {
     this.loginError.set('Ocurrió un error. Por favor, intenta de nuevo.');
+    this.isLoading.set(false);
+    console.log('Login failed');
   }
 }

@@ -1,0 +1,33 @@
+<section class="gap-card" data-testid="gap-region">
+  <header class="gap-card__header">
+    <h3 class="gap-card__title">Gap analysis</h3>
+    <p class="gap-card__subtitle">Priorizacion visual de conocimiento faltante.</p>
+  </header>
+
+  <div class="gap-card__metrics">
+    @for (metric of metrics; track metric.label) {
+      <article class="gap-metric" data-testid="gap-metric-card">
+        <p class="gap-metric__label">{{ metric.label }}</p>
+        <p class="gap-metric__value">{{ metric.value }}</p>
+      </article>
+    }
+  </div>
+
+  <div class="gap-card__priority-cards">
+    @for (item of priorityCards; track item.priority) {
+      <article class="gap-priority" [attr.data-priority]="item.priority" data-testid="gap-priority-card">
+        <p class="gap-priority__label">Prioridad {{ item.priority }}</p>
+        <p class="gap-priority__value">{{ item.count }} temas</p>
+      </article>
+    }
+  </div>
+
+  <div class="gap-card__ranking">
+    @for (gap of prioritizedGaps(); track gap.id) {
+      <article class="gap-row" [attr.data-priority]="gap.prioridad">
+        <p class="gap-row__topic">{{ gap.tema }}</p>
+        <p class="gap-row__meta">{{ gap.ocurrencias }} ocurrencias · cobertura {{ gap.coberturaEstimada * 100 }}%</p>
+      </article>
+    }
+  </div>
+</section>

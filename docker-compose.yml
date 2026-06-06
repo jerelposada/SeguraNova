@@ -20,7 +20,7 @@ services:
     container_name: seguranova-api
     build:
       context: ./SeguroNova.Api
-      dockerfile: src/API/Dockerfile
+      dockerfile: src/API/Dockerfile.dev
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
@@ -33,16 +33,22 @@ services:
         condition: service_healthy
     ports:
       - "5132:8080"
+    volumes:
+      - ./SeguroNova.Api:/src
+      - seguranova_nuget_cache:/root/.nuget/packages
 
   spa:
     container_name: seguranova-spa
     build:
       context: ./SeguraNova.Spa
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     depends_on:
       - api
     ports:
-      - "4200:80"
+      - "4200:4200"
+    volumes:
+      - ./SeguraNova.Spa:/app
+      - seguranova_spa_node_modules:/app/node_modules
 
   pgadmin:
     image: dpage/pgadmin4:8.9
@@ -63,3 +69,5 @@ services:
 volumes:
   seguranova_postgres_data:
   seguranova_pgadmin_data:
+  seguranova_nuget_cache:
+  seguranova_spa_node_modules:

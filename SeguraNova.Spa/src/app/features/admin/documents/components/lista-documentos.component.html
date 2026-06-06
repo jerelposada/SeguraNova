@@ -1,0 +1,75 @@
+<section class="documents-list" data-testid="list-region">
+  <div class="documents-list__header">
+    <div>
+      <p class="documents-list__eyebrow">Catalogo</p>
+      <h3 class="documents-list__title">Catalogo documental</h3>
+    </div>
+  </div>
+
+  <div class="documents-list__filters">
+    @for (filter of filters(); track filter) {
+      <button
+        class="documents-list__filter"
+        [attr.data-filter]="filter"
+        [class.documents-list__filter--active]="filter === activeFilter()"
+        data-testid="document-filter"
+        type="button"
+        (click)="onFilterSelected(filter)"
+      >
+        {{ filter }}
+      </button>
+    }
+  </div>
+
+  <div class="documents-list__rows">
+    @for (document of visibleDocuments(); track document.id) {
+      <article class="document-row" data-testid="document-row">
+        <div class="document-row__summary">
+          <div>
+            <p class="document-row__name">{{ document.nombre }}</p>
+            <p class="document-row__meta">
+              {{ document.categoria }} · {{ document.knowledgeBase }} · {{ document.actualizadoEl }}
+            </p>
+          </div>
+
+          <span class="document-row__status">{{ document.estado }}</span>
+        </div>
+
+        <dl class="document-row__details">
+          <div>
+            <dt>Version</dt>
+            <dd>{{ document.versionActiva }}</dd>
+          </div>
+          <div>
+            <dt>Chunks</dt>
+            <dd>{{ document.chunks }}</dd>
+          </div>
+        </dl>
+
+        <div class="document-row__actions">
+          <button
+            class="document-row__button"
+            [attr.data-document-id]="document.id"
+            data-testid="select-document"
+            type="button"
+            (click)="onDocumentSelected(document.id)"
+          >
+            Ver versiones
+          </button>
+
+          <button
+            class="document-row__button document-row__button--secondary"
+            [attr.data-document-id]="document.id"
+            data-testid="open-preview"
+            type="button"
+            (click)="onPreviewOpened(document.id)"
+          >
+            Ver chunks
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <p class="documents-list__empty">No hay documentos para este filtro.</p>
+    }
+  </div>
+</section>

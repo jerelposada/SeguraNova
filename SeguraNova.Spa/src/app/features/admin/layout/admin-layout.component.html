@@ -1,0 +1,29 @@
+<div class="admin-layout">
+  <header class="admin-layout__topbar" data-testid="admin-topbar">
+    <h1 class="admin-layout__title">Panel administrativo</h1>
+  </header>
+
+  <div class="admin-layout__body">
+    <aside class="admin-layout__sidebar" data-testid="admin-sidebar">
+      <nav aria-label="Secciones de administracion">
+        <ul class="admin-layout__nav-list">
+          @for (item of navItems(); track item.route) {
+            <li class="admin-layout__nav-item">
+              <a
+                [routerLink]="item.route"
+                class="admin-layout__nav-link"
+                routerLinkActive="admin-layout__nav-link--active"
+              >
+                <span data-testid="admin-sidebar-item-label">{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="admin-layout__content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

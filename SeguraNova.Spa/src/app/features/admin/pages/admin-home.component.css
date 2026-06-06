@@ -1,0 +1,14 @@
+.admin-shell {
+  padding: var(--sp-3);
+}
+
+.admin-shell__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-2xl);
+}
+
+.admin-shell__description {
+  color: var(--clr-body);
+  font-size: var(--fs-md);
+  margin-top: var(--sp-1);
+}

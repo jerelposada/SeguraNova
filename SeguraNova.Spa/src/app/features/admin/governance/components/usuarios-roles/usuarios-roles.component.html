@@ -1,0 +1,67 @@
+<section class="users-card" data-testid="usuarios-roles">
+  <header class="users-card__header">
+    <h3 class="users-card__title">Usuarios y roles</h3>
+    <p class="users-card__subtitle">Gestion local de accesos y perfiles.</p>
+  </header>
+
+  <div class="users-card__filters" data-testid="rol-filters">
+    @for (rol of roles(); track rol) {
+      <button
+        type="button"
+        class="users-chip"
+        [class.users-chip--active]="rolFiltro() === rol"
+        [attr.data-rol]="rol"
+        data-testid="rol-filter"
+        (click)="selectRol(rol)"
+      >
+        {{ rol }}
+      </button>
+    }
+  </div>
+
+  @if (filteredUsuarios().length === 0) {
+    <p class="users-card__empty">Sin resultados</p>
+  } @else {
+    <div class="users-table" data-testid="usuarios-table">
+      @for (usuario of filteredUsuarios(); track usuario.id) {
+        <article class="users-row" data-testid="usuario-row">
+          <div>
+            <p class="users-row__name">{{ usuario.nombre }}</p>
+            <p class="users-row__mail">{{ usuario.correo }}</p>
+          </div>
+          <div class="users-row__meta">
+            <span class="users-role" [attr.data-role]="usuario.rol">{{ usuario.rol }}</span>
+            <span class="users-status" [attr.data-status]="usuario.estado">{{ usuario.estado }}</span>
+            <button
+              type="button"
+              class="users-row__button"
+              data-testid="usuario-open-modal"
+              [attr.data-usuario-id]="usuario.id"
+              (click)="openUsuarioModal(usuario.id)"
+            >
+              Ver detalle
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (modalUsuario(); as selectedUsuario) {
+    <aside class="users-modal" data-testid="usuario-modal">
+      <div class="users-modal__content">
+        <h4 class="users-modal__title">{{ selectedUsuario.nombre }}</h4>
+        <p class="users-modal__text">Rol actual: {{ selectedUsuario.rol }}</p>
+        <p class="users-modal__text">Correo: {{ selectedUsuario.correo }}</p>
+        <button
+          type="button"
+          class="users-modal__close"
+          data-testid="usuario-close-modal"
+          (click)="closeUsuarioModal()"
+        >
+          Cerrar
+        </button>
+      </div>
+    </aside>
+  }
+</section>

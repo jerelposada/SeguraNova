@@ -1,42 +1,81 @@
-[
-  {
-    "id": 1,
-    "name": "user-authentication",
-    "description": "Autenticación JWT completa: Angular 18 → AuthController (.NET 8) → PostgreSQL (Docker). Claims: sub, email, roles[], knowledge_bases[]. Access token 60min, refresh token 7 días con renovación automática vía interceptor. Roles: admin_ti → /admin, agente_siniestros y empleado → /chat. Sin ASP.NET Core Identity, solo BCrypt.Net-Next.",
-    "status": "done",
-    "sdd": true,
-    "completed_at": "2026-06-04"
-  },
-  {
-    "id": 2,
-    "name": "auth-service-frontend",
-    "status": "in_progress",
-    "status": "done",
-    "sdd": true,
-    "completed_at": "2026-06-04"
-  },
-  {
-    "id": 3,
-    "name": "auth-interceptor",
-    "description": "HttpInterceptor funcional Angular 18 (withInterceptors, no clase). Adjunta Authorization: Bearer en cada request excepto login y refresh. Maneja 401: llama refreshToken(), reintenta con switchMap, si falla llama signOut().",
-    "status": "done",
-    "sdd": true,
-    "completed_at": "2026-06-04"
-  },
-  {
-    "id": 4,
-    "name": "auth-guard-role-redirect",
-    "description": "canActivate guard funcional. Decodifica JWT con atob sin librería. Redirige a /login si no hay token o está expirado. Tras login exitoso redirige según rol: admin_ti → /admin, resto → /chat.",
-    "status": "done",
-    "sdd": true,
-    "completed_at": "2026-06-04"
-  },
-  {
-    "id": 5,
-    "name": "authentication-and-authorization-module",
-    "description": "Implementar el módulo completo de autenticación y autorización. Crear las entidades de dominio User, Role, UserRole y UserKnowledgeBase utilizando Guid como clave primaria. Configurar ApplicationDbContext con EF Core y Npgsql, generar la migración inicial y realizar seed de un usuario administrador con contraseña hasheada mediante BCrypt. Definir el enum KnowledgeBase con los valores: polizas, siniestros, rrhh, legal y operaciones. Implementar IAuthService en Application con los métodos LoginAsync, RefreshAsync y RevokeAsync, y su implementación en Infrastructure utilizando BCrypt.Verify para validación de credenciales, JWT HS256 con claims (sub, email, roles, knowledge_bases y exp de 60 minutos), además de refresh tokens UUID hasheados almacenados en base de datos con expiración de 7 días. La clave JWT debe obtenerse desde IConfiguration. Exponer AuthController con los endpoints POST /api/auth/login (200 o 401 con mensaje genérico), POST /api/auth/refresh (200 o 401) y POST /api/auth/logout ([Authorize], 204). Configurar rate limiting para el endpoint de login utilizando el Rate Limiter nativo de .NET 8, permitiendo un máximo de 5 intentos por IP por minuto.",
-    "status": "done",
-    "sdd": true,
-    "completed_at": "2026-06-05"
-  }
+﻿[
+    {
+        "id":  1,
+        "name":  "user-authentication",
+        "description":  "AutenticaciÃ³n JWT completa: Angular 18 â†’ AuthController (.NET 8) â†’ PostgreSQL (Docker). Claims: sub, email, roles[], knowledge_bases[]. Access token 60min, refresh token 7 dÃ­as con renovaciÃ³n automÃ¡tica vÃ­a interceptor. Roles: admin_ti â†’ /admin, agente_siniestros y empleado â†’ /chat. Sin ASP.NET Core Identity, solo BCrypt.Net-Next.",
+        "status": "done",
+        "sdd": true,
+        "completed_at":  "2026-06-04"
+    },
+    {
+        "id":  2,
+        "name":  "auth-service-frontend",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at": "2026-06-06"
+        "completed_at":  "2026-06-04"
+    },
+    {
+        "id":  3,
+        "name":  "auth-interceptor",
+        "description":  "HttpInterceptor funcional Angular 18 (withInterceptors, no clase). Adjunta Authorization: Bearer en cada request excepto login y refresh. Maneja 401: llama refreshToken(), reintenta con switchMap, si falla llama signOut().",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-04"
+    },
+    {
+        "id":  4,
+        "name":  "auth-guard-role-redirect",
+        "description":  "canActivate guard funcional. Decodifica JWT con atob sin librerÃ­a. Redirige a /login si no hay token o estÃ¡ expirado. Tras login exitoso redirige segÃºn rol: admin_ti â†’ /admin, resto â†’ /chat.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-04"
+    },
+    {
+        "id":  5,
+        "name":  "authentication-and-authorization-module",
+        "description":  "Implementar el mÃ³dulo completo de autenticaciÃ³n y autorizaciÃ³n. Crear las entidades de dominio User, Role, UserRole y UserKnowledgeBase utilizando Guid como clave primaria. Configurar ApplicationDbContext con EF Core y Npgsql, generar la migraciÃ³n inicial y realizar seed de un usuario administrador con contraseÃ±a hasheada mediante BCrypt. Definir el enum KnowledgeBase con los valores: polizas, siniestros, rrhh, legal y operaciones. Implementar IAuthService en Application con los mÃ©todos LoginAsync, RefreshAsync y RevokeAsync, y su implementaciÃ³n en Infrastructure utilizando BCrypt.Verify para validaciÃ³n de credenciales, JWT HS256 con claims (sub, email, roles, knowledge_bases y exp de 60 minutos), ademÃ¡s de refresh tokens UUID hasheados almacenados en base de datos con expiraciÃ³n de 7 dÃ­as. La clave JWT debe obtenerse desde IConfiguration. Exponer AuthController con los endpoints POST /api/auth/login (200 o 401 con mensaje genÃ©rico), POST /api/auth/refresh (200 o 401) y POST /api/auth/logout ([Authorize], 204). Configurar rate limiting para el endpoint de login utilizando el Rate Limiter nativo de .NET 8, permitiendo un mÃ¡ximo de 5 intentos por IP por minuto.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-05"
+    },
+    {
+        "id":  6,
+        "name":  "admin-layout-navigation",
+        "description":  "Implementar la estructura base del Admin Panel de SeguraNova utilizando Angular 20 y las mejores prÃ¡cticas vigentes del framework. Crear AdminLayoutComponent con Topbar, Sidebar y Router Outlet. Configurar el sistema de navegaciÃ³n mediante Router. El Sidebar debe contener las secciones: Principal, Documentos, Agente, Usuarios y Permisos, y Monitoreo. Implementar navegaciÃ³n con routerLink y routerLinkActive. Utilizar exclusivamente la paleta de colores, tipografÃ­as, design tokens y estilos globales definidos por la aplicaciÃ³n. Mantener consistencia visual con el sistema de diseÃ±o existente. Usar standalone components, lazy loading, control flow moderno (@if, @for), signals cuando aplique, estructura feature-first y convenciones recomendadas para Angular 20. Sin llamadas HTTP, sin servicios externos y sin lÃ³gica de negocio; Ãºnicamente maquetaciÃ³n con datos estÃ¡ticos.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-05"
+    },
+    {
+        "id":  7,
+        "name":  "admin-document-management-ui",
+        "description":  "Implementar los mÃ³dulos visuales de gestiÃ³n documental del Admin Panel utilizando Angular 20. Crear los componentes UploadDocumentoComponent, ListaDocumentosComponent, VersionesDocumentoComponent y ChunkPreviewComponent. Incluir zona de carga de documentos, filtros, tablas, timelines, cards, badges, chips, modales y estados visuales necesarios para representar la gestiÃ³n documental. Todos los datos deben estar hardcodeados dentro de los componentes. Utilizar exclusivamente la paleta de colores, tipografÃ­as, design tokens y estilos globales definidos por la aplicaciÃ³n. Aplicar estÃ¡ndares modernos de Angular 20: standalone components, control flow (@if, @for), signals para estado local cuando sea necesario y estructura feature-first. Sin lÃ³gica de negocio, APIs, HttpClient o servicios.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-05"
+    },
+    {
+        "id":  8,
+        "name":  "admin-agent-management-ui",
+        "description":  "Implementar los componentes visuales relacionados con la administraciÃ³n del agente de IA utilizando Angular 20. Crear HistorialConversacionesComponent, GapAnalysisComponent, SemanticCacheConfigComponent y RetrievalEffortComponent. Incluir tablas, filtros, listas agrupadas, sliders, toggles, mÃ©tricas visuales, tarjetas informativas y configuraciones simuladas mediante datos hardcodeados. Utilizar exclusivamente la paleta de colores, tipografÃ­as, design tokens y estilos globales definidos por la aplicaciÃ³n. Seguir las recomendaciones actuales de Angular 20: standalone components, control flow moderno, signals para estado local y organizaciÃ³n feature-first. No implementar lÃ³gica real, llamadas HTTP, almacenamiento ni integraciones externas.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-05"
+    },
+    {
+        "id":  9,
+        "name":  "admin-governance-monitoring-ui",
+        "description":  "Implementar los componentes visuales de administraciÃ³n, gobierno y monitoreo del sistema utilizando Angular 20. Crear DashboardComponent, UsuariosRolesComponent, KnowledgeBasesComponent, MetricasUsoComponent y AuditLogComponent. Incluir tarjetas de mÃ©tricas, tablas administrativas, filtros, chips, indicadores visuales, grÃ¡ficos simples basados en CSS, modales y vistas de monitoreo utilizando exclusivamente datos hardcodeados. Mantener consistencia con la paleta de colores, tipografÃ­as, design tokens y estilos globales definidos por la aplicaciÃ³n. Aplicar los estÃ¡ndares actuales de Angular 20: standalone components, lazy loading, control flow (@if, @for), signals para estado local cuando corresponda y arquitectura feature-first. Sin lÃ³gica de negocio, APIs, HttpClient, servicios ni persistencia.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-05"
+    },
+    {
+        "id":  10,
+        "name":  "user_experience-improvements",
+        "description":  "Al realizar la acciÃ³n de inicio de sesiÃ³n, si el usuario y/o la contraseÃ±a son incorrectos, se muestra el mensaje de error correctamente. sin embargo, el botÃ³n queda en un estado de \u0027iniciando sesiÃ³n\u0027 y con el loading infinito. Una vez que aparece el mensaje de error, el botÃ³n debe volver a su estado normal para que el usuario pueda intentar iniciar sesiÃ³n nuevamente sin necesidad de recargar la pÃ¡gina.",
+        "status":  "in_progress",
+        "sdd":  true
+    }
 ]

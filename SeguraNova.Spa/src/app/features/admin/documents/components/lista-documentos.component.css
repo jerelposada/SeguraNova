@@ -1,0 +1,105 @@
+.documents-list {
+  background: var(--clr-bg);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-inset-xs);
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+}
+
+.documents-list__eyebrow,
+.document-row__meta,
+.documents-list__empty,
+.document-row__details dt {
+  color: var(--clr-muted);
+  font-size: var(--fs-sm);
+}
+
+.documents-list__title,
+.document-row__name,
+.document-row__details dd {
+  color: var(--clr-heading);
+}
+
+.documents-list__title {
+  font-size: var(--fs-xl);
+}
+
+.documents-list__filters,
+.documents-list__rows {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.documents-list__filters {
+  grid-template-columns: repeat(auto-fit, minmax(calc(var(--sp-6) * 2), 1fr));
+}
+
+.documents-list__filter,
+.document-row__button {
+  border: 0;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-1) var(--sp-2);
+}
+
+.documents-list__filter {
+  background: var(--clr-surface);
+  box-shadow: var(--neu-xs);
+  color: var(--clr-body);
+}
+
+.documents-list__filter--active,
+.document-row__button {
+  background: var(--clr-primary);
+  color: var(--clr-on-primary);
+}
+
+.document-row {
+  background: var(--clr-surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-xs);
+  display: grid;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+}
+
+.document-row__summary,
+.document-row__actions {
+  align-items: center;
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: space-between;
+}
+
+.document-row__status,
+.document-row__button--secondary {
+  background: var(--clr-primary-ultra);
+  color: var(--clr-primary-active);
+}
+
+.document-row__details {
+  display: grid;
+  gap: var(--sp-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.document-row__details div {
+  background: var(--clr-bg);
+  border-radius: var(--r-md);
+  padding: var(--sp-2);
+}
+
+.document-row__details dd {
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+@media (max-width: calc(var(--sp-6) * 10)) {
+  .document-row__summary,
+  .document-row__actions {
+    align-items: start;
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,43 @@
+<section class="versions-card" data-testid="versions-region">
+  <div class="versions-card__header">
+    <div>
+      <p class="versions-card__eyebrow">Versionado</p>
+      <h3 class="versions-card__title">Versiones</h3>
+    </div>
+
+    <button class="versions-card__cta" data-testid="new-version-cta" type="button">
+      Subir nueva version
+    </button>
+  </div>
+
+  @if (document(); as activeDocument) {
+    <div class="versions-card__document">
+      <p class="versions-card__document-name">{{ activeDocument.nombre }}</p>
+      <p class="versions-card__document-meta">
+        {{ activeDocument.categoria }} · {{ activeDocument.knowledgeBase }}
+      </p>
+    </div>
+
+    <div class="versions-card__timeline">
+      @for (version of versions(); track version.id) {
+        <button
+          class="version-item"
+          [attr.data-testid]="version.id === selectedVersionId() ? 'version-item-active' : 'version-item'"
+          [class.version-item--active]="version.id === selectedVersionId()"
+          type="button"
+          (click)="onVersionSelected(version.id)"
+        >
+          <div class="version-item__summary">
+            <span class="version-item__label">{{ version.version }}</span>
+            <span class="version-item__status">{{ version.estado }}</span>
+          </div>
+
+          <p class="version-item__meta">{{ version.creadoEl }} · {{ version.autor }}</p>
+          <p class="version-item__meta">{{ version.paginas }} paginas</p>
+        </button>
+      }
+    </div>
+  } @else {
+    <p class="versions-card__empty">Selecciona un documento para revisar su historial.</p>
+  }
+</section>

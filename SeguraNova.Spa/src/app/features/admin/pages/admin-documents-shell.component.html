@@ -1,0 +1,35 @@
+<section class="documents-shell" data-testid="documents-shell">
+  <header class="documents-shell__header">
+    <div>
+      <p class="documents-shell__eyebrow">Admin / Documentos</p>
+      <h2 class="documents-shell__title">Gestion documental</h2>
+    </div>
+  </header>
+
+  <div class="documents-shell__grid">
+    <app-upload-documento />
+
+    <app-lista-documentos
+      [activeFilter]="activeFilter()"
+      [documents]="documents()"
+      (documentSelected)="onDocumentSelected($event)"
+      (filterChanged)="onFilterChange($event)"
+      (previewOpened)="openPreview($event)"
+    />
+
+    <app-versiones-documento
+      [document]="selectedDocument()"
+      [selectedVersionId]="selectedVersionId()"
+      [versions]="versions()"
+      (versionSelected)="onVersionSelected($event)"
+    />
+
+    <app-chunk-preview
+      [chunks]="previewChunks()"
+      [document]="selectedDocument()"
+      [isOpen]="previewOpen()"
+      [version]="selectedVersion()"
+      (closed)="closePreview()"
+    />
+  </div>
+</section>

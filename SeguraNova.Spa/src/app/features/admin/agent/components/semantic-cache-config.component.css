@@ -1,0 +1,39 @@
+.cache-card {
+  background: var(--clr-surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--neu-sm);
+  padding: var(--sp-2);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.cache-card__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-xl);
+}
+
+.cache-card__subtitle,
+.cache-card__field span,
+.cache-card__switch span {
+  color: var(--clr-body);
+  font-size: var(--fs-sm);
+}
+
+.cache-card__field,
+.cache-card__switch {
+  display: grid;
+  gap: 6px;
+}
+
+.cache-card input[type='number'],
+.cache-card input[type='range'] {
+  width: 100%;
+}
+
+.cache-card__summary {
+  color: var(--clr-heading);
+  font-size: var(--fs-sm);
+  border-radius: var(--r-md);
+  background: var(--clr-bg);
+  padding: var(--sp-1);
+}

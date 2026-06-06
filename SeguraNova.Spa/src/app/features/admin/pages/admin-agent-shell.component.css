@@ -1,0 +1,41 @@
+.agent-shell {
+  padding: var(--sp-3);
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.agent-shell__header {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.agent-shell__title {
+  color: var(--clr-heading);
+  font-size: var(--fs-2xl);
+}
+
+.agent-shell__subtitle {
+  color: var(--clr-body);
+  font-size: var(--fs-md);
+}
+
+.agent-shell__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.agent-shell__state {
+  border-radius: var(--r-md);
+  background: var(--clr-surface);
+  box-shadow: var(--neu-xs);
+  color: var(--clr-body);
+  font-size: var(--fs-sm);
+  padding: var(--sp-1);
+}
+
+@media (max-width: 1080px) {
+  .agent-shell__grid {
+    grid-template-columns: 1fr;
+  }
+}

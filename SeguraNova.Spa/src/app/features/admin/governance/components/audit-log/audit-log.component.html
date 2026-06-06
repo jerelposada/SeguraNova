@@ -1,0 +1,37 @@
+<section class="audit-card" data-testid="audit-log">
+  <header>
+    <h3 class="audit-card__title">Audit log</h3>
+    <p class="audit-card__subtitle">Trazabilidad local de eventos administrativos.</p>
+  </header>
+
+  <div class="audit-filters">
+    @for (severidad of severidades(); track severidad) {
+      <button
+        type="button"
+        class="audit-chip"
+        [class.audit-chip--active]="severidadFiltro() === severidad"
+        [attr.data-severity]="severidad"
+        data-testid="audit-filter"
+        (click)="selectSeveridad(severidad)"
+      >
+        {{ severidad }}
+      </button>
+    }
+  </div>
+
+  <div class="audit-table">
+    @for (evento of filteredEventos(); track evento.id) {
+      <article
+        class="audit-row"
+        data-testid="audit-row"
+        [attr.data-severity]="evento.severidad"
+      >
+        <p class="audit-row__action">{{ evento.accion }}</p>
+        <p class="audit-row__meta">{{ evento.fecha }} · {{ evento.actor }}</p>
+        <span class="audit-row__severity" [attr.data-severity]="evento.severidad">
+          {{ evento.severidad }}
+        </span>
+      </article>
+    }
+  </div>
+</section>
