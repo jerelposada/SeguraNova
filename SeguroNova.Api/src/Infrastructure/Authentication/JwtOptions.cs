@@ -1,4 +1,4 @@
-namespace Repository.Authentication;
+namespace Infrastructure.Authentication;
 
 public sealed class JwtOptions
 {

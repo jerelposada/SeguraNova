@@ -1,10 +1,14 @@
+using Application.Authentication;
+using Application.Abstractions.Persistence;
+using Application.Abstractions.Security;
+using Application.Abstractions.Time;
 using Application.DTOs.Auth;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Repository.Authentication;
 using Repository.Persistence;
+using Repository.Persistence.Repositories;
 
 namespace Repository.Tests.Authentication;
 
@@ -88,7 +92,9 @@ public sealed class AuthServiceBehaviorTests
 
     private static AuthService CreateService(ApplicationDbContext context, ISystemClock clock)
     {
-        return new AuthService(context, new FakeAccessTokenGenerator(), clock);
+        IUserRepository userRepository = new UserRepository(context);
+        IRefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository(context);
+        return new AuthService(userRepository, refreshTokenRepository, new FakeAccessTokenGenerator(), new FakePasswordHasher(), clock);
     }
 
     private static async Task<User> SeedUserAsync(ApplicationDbContext context, string email, string password)
@@ -125,6 +131,19 @@ public sealed class AuthServiceBehaviorTests
         public string Generate(User user, IReadOnlyCollection<string> roles, IReadOnlyCollection<string> knowledgeBases, DateTime nowUtc)
         {
             return $"fake-jwt-{user.Id}";
+        }
+    }
+
+    private sealed class FakePasswordHasher : IPasswordHasher
+    {
+        public bool Verify(string plainText, string hash)
+        {
+            return BCrypt.Net.BCrypt.Verify(plainText, hash);
+        }
+
+        public string Hash(string plainText)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(plainText);
         }
     }
 

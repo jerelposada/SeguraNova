@@ -1,4 +1,6 @@
-namespace Repository.Authentication;
+using Application.Abstractions.Time;
+
+namespace Infrastructure.Time;
 
 public sealed class SystemClock : ISystemClock
 {

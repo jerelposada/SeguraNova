@@ -1,3 +1,80 @@
+import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
+import { AdminLayoutComponent } from './admin-layout.component';
+
+describe('AdminLayoutComponent (T1)', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AdminLayoutComponent],
+      providers: [provideZonelessChangeDetection()],
+    }).compileComponents();
+  });
+
+  it('should render topbar, sidebar and main content', () => {
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+
+    const topbar = el.querySelector('[role="banner"], [data-testid="admin-topbar"], .admin-topbar, .admin-layout__topbar');
+    const sidebar = el.querySelector('[role="navigation"], [data-testid="admin-sidebar"], .admin-sidebar, .admin-layout__sidebar');
+    const main = el.querySelector('[role="main"], .admin-main, .admin-layout__content');
+
+    expect(topbar).toBeTruthy();
+    expect(sidebar).toBeTruthy();
+    expect(main).toBeTruthy();
+  });
+});
+import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AdminLayoutComponent } from './admin-layout.component';
+import { DashboardComponent } from '../../../Pages/dashboard/dashboard.component';
+
+describe('AdminLayoutComponent (UX)', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AdminLayoutComponent, RouterTestingModule.withRoutes([
+        { path: 'admin', component: DashboardComponent },
+      ])]
+    }).compileComponents();
+  });
+
+  it('renders topbar, sidebar and main content (R1)', () => {
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.admin-topbar')).toBeTruthy();
+    expect(el.querySelector('.admin-sidebar')).toBeTruthy();
+    expect(el.querySelector('.admin-main')).toBeTruthy();
+  });
+
+  it('marks link active when navigating to admin (R2)', async () => {
+    const router = TestBed.inject(Router);
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
+    await router.navigate(['/admin']);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const active = el.querySelector('.nav-link.active');
+    expect(active).toBeTruthy();
+    expect(active?.textContent).toContain('Dashboard');
+  });
+
+  it('adds is-mobile class for small viewport (R4)', () => {
+    (global as any).innerWidth = 360;
+    global.dispatchEvent(new Event('resize'));
+    const fixture = TestBed.createComponent(AdminLayoutComponent);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.admin-layout')?.classList.contains('is-mobile')).toBeTrue();
+
+    const body = el.querySelector('.admin-body') as HTMLElement | null;
+    if (body) {
+      const style = getComputedStyle(body);
+      expect(style.flexDirection === 'column' || style.flexDirection === 'column-reverse').toBeTrue();
+    }
+  });
+});
 import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet, Routes } from '@angular/router';
@@ -100,6 +177,7 @@ describe('AdminLayoutComponent', () => {
     expect(styles).toContain('var(--clr-');
     expect(styles).toContain('var(--sp-');
     expect(styles).toContain('var(--fs-');
+    expect(styles).toContain('--neu-');
     expect(styles).not.toMatch(/\b\d+px\b/);
     expect(styles).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     expect(styles).not.toMatch(/rgba?\(/);

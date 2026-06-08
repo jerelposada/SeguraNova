@@ -1,11 +1,17 @@
 using System.Text;
 using System.Threading.RateLimiting;
+using Application.Authentication;
 using Application.Abstractions.Authentication;
+using Application.Abstractions.Persistence;
+using Application.Abstractions.Security;
+using Application.Abstractions.Time;
+using Infrastructure.Authentication;
+using Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Repository.Authentication;
 using Repository.Persistence;
+using Repository.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +25,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddSingleton<IAccessTokenGenerator, JwtAccessTokenGenerator>();
+builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddSingleton<ISystemClock, SystemClock>();
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();

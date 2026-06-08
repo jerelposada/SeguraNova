@@ -49,6 +49,16 @@ public class AuthContractsTests
             HasParameters(m, typeof(Guid), typeof(string), typeof(CancellationToken)));
     }
 
+    [Fact]
+    public void AuthService_Implementation_ShouldLiveInApplicationLayer()
+    {
+        var applicationAssembly = typeof(IAuthService).Assembly;
+        var implementationType = applicationAssembly.GetType("Application.Authentication.AuthService");
+
+        Assert.NotNull(implementationType);
+        Assert.True(typeof(IAuthService).IsAssignableFrom(implementationType));
+    }
+
     private static bool HasParameters(MethodInfo methodInfo, params Type[] expectedTypes)
     {
         var parameters = methodInfo.GetParameters();

@@ -1,21 +1,24 @@
 using Application.Abstractions.Authentication;
+using Application.Abstractions.Persistence;
+using Application.Abstractions.Security;
+using Application.Abstractions.Time;
 using Application.DTOs.Auth;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Repository.Persistence;
 
-namespace Repository.Authentication;
+namespace Application.Authentication;
 
 public sealed class AuthService(
-    ApplicationDbContext dbContext,
+    IUserRepository userRepository,
+    IRefreshTokenRepository refreshTokenRepository,
     IAccessTokenGenerator accessTokenGenerator,
+    IPasswordHasher passwordHasher,
     ISystemClock clock) : IAuthService
 {
     public async Task<AuthTokensResponse?> LoginAsync(LoginRequest request, CancellationToken ct)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var user = await LoadUserByEmailAsync(normalizedEmail, ct);
-        var credentialsValid = user is not null && BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+        var user = await userRepository.FindByNormalizedEmailAsync(normalizedEmail, ct);
+        var credentialsValid = user is not null && passwordHasher.Verify(request.Password, user.PasswordHash);
         if (!credentialsValid)
         {
             return null;
@@ -27,14 +30,8 @@ public sealed class AuthService(
     public async Task<AuthTokensResponse?> RefreshAsync(RefreshRequest request, CancellationToken ct)
     {
         var now = clock.UtcNow;
-        var tokens = await dbContext.RefreshTokens.Include(x => x.User)
-            .ThenInclude(x => x.UserRoles)
-            .ThenInclude(x => x.Role)
-            .Include(x => x.User.KnowledgeBases)
-            .Where(x => !x.IsRevoked && x.ExpiresAtUtc > now)
-            .ToListAsync(ct);
-
-        var match = tokens.FirstOrDefault(x => BCrypt.Net.BCrypt.Verify(request.RefreshToken, x.TokenHash));
+        var tokens = await refreshTokenRepository.GetValidTokensWithUserAsync(now, ct);
+        var match = tokens.FirstOrDefault(x => passwordHasher.Verify(request.RefreshToken, x.TokenHash));
         if (match is null)
         {
             return null;
@@ -47,33 +44,24 @@ public sealed class AuthService(
 
     public async Task<bool> RevokeAsync(Guid userId, string refreshToken, CancellationToken ct)
     {
-        var activeTokens = await dbContext.RefreshTokens
-            .Where(x => x.UserId == userId && !x.IsRevoked)
-            .ToListAsync(ct);
-
         var now = clock.UtcNow;
+        var activeTokens = await refreshTokenRepository.GetActiveTokensByUserAsync(userId, now, ct);
         var revoked = false;
+
         foreach (var token in activeTokens)
         {
-            if (BCrypt.Net.BCrypt.Verify(refreshToken, token.TokenHash))
+            if (!passwordHasher.Verify(refreshToken, token.TokenHash))
             {
-                token.IsRevoked = true;
-                token.RevokedAtUtc = now;
-                revoked = true;
+                continue;
             }
+
+            token.IsRevoked = true;
+            token.RevokedAtUtc = now;
+            revoked = true;
         }
 
-        await dbContext.SaveChangesAsync(ct);
+        await refreshTokenRepository.SaveChangesAsync(ct);
         return revoked;
-    }
-
-    private async Task<User?> LoadUserByEmailAsync(string normalizedEmail, CancellationToken ct)
-    {
-        return await dbContext.Users
-            .Include(x => x.UserRoles)
-            .ThenInclude(x => x.Role)
-            .Include(x => x.KnowledgeBases)
-            .SingleOrDefaultAsync(x => x.Email == normalizedEmail, ct);
     }
 
     private async Task<AuthTokensResponse> IssueTokenPairAsync(User user, CancellationToken ct)
@@ -87,12 +75,13 @@ public sealed class AuthService(
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
-            TokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken),
+            TokenHash = passwordHasher.Hash(refreshToken),
             ExpiresAtUtc = now.AddDays(7),
             IsRevoked = false
         };
-        dbContext.RefreshTokens.Add(refreshEntity);
-        await dbContext.SaveChangesAsync(ct);
+
+        await refreshTokenRepository.AddAsync(refreshEntity, ct);
+        await refreshTokenRepository.SaveChangesAsync(ct);
         return new AuthTokensResponse { AccessToken = accessToken, RefreshToken = refreshToken, ExpiresIn = 3600 };
     }
 }

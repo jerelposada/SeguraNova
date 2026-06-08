@@ -1,4 +1,4 @@
-namespace Repository.Authentication;
+namespace Application.Abstractions.Time;
 
 public interface ISystemClock
 {

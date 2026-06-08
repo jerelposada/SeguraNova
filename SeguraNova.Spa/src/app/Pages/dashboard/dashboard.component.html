@@ -5,8 +5,8 @@
 		<p class="dashboard__status">{{ operationalStatus() }}</p>
 	</header>
 
-	<div class="dashboard__kpis">
-		@for (kpi of kpis(); track kpi.label) {
+	<div class="dashboard__kpis" data-testid="kpi-grid">
+		@for (kpi of kpis() ; track $index) {
 			<article class="dashboard__kpi-card" data-testid="dashboard-kpi-card">
 				<p class="dashboard__kpi-label">{{ kpi.label }}</p>
 				<p class="dashboard__kpi-value">{{ kpi.value }}</p>
@@ -16,6 +16,17 @@
 	</div>
 
 	<div class="dashboard__sections">
+		<section class="dashboard__section" data-testid="dashboard-section">
+			<h3>Monitoreo</h3>
+			<p>Información de salud del sistema y alertas recientes.</p>
+		</section>
+
+		<section class="dashboard__section" data-testid="dashboard-section">
+			<h3>Gobierno</h3>
+			<p>Control de accesos y resumen de permisos.</p>
+		</section>
+
+		<!-- Server-side components (if present) kept for integration -->
 		<app-usuarios-roles />
 		<app-knowledge-bases />
 		<app-metricas-uso />

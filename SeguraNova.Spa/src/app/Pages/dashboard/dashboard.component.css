@@ -7,6 +7,9 @@
   gap: var(--sp-2);
 }
 
+/* Ensure dashboard doesn't overflow horizontally and uses neumorphic tokens */
+.dashboard { box-sizing: border-box; max-width: 100%; overflow-x: hidden; padding: calc(var(--sp-3) + 12px); background: linear-gradient(180deg, rgba(6,8,20,0.01), transparent 30%); }
+
 .dashboard__header {
   background: var(--clr-bg);
   border-radius: var(--r-lg);
@@ -38,12 +41,19 @@
 }
 
 .dashboard__kpi-card {
-  background: var(--clr-surface);
-  border-radius: var(--r-md);
-  box-shadow: var(--neu-xs);
+  background: linear-gradient(180deg, var(--clr-surface), rgba(255,255,255,0.03));
+  border-radius: calc(var(--r-2xl) + 8px);
+  box-shadow: 0 30px 60px rgba(2,6,23,0.16), var(--neu-xl);
   display: grid;
-  gap: 2px;
-  padding: var(--sp-2);
+  gap: 6px;
+  padding: calc(var(--sp-3) + 12px);
+  transition: transform var(--t-fast), box-shadow var(--t-fast), filter var(--t-fast);
+}
+
+.dashboard__kpi-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 40px 80px rgba(2,6,23,0.18), 0 20px 40px rgba(16,24,40,0.12);
+  filter: saturate(1.03);
 }
 
 .dashboard__kpi-label,
@@ -54,7 +64,7 @@
 
 .dashboard__kpi-value {
   color: var(--clr-heading);
-  font-size: var(--fs-2xl);
+  font-size: calc(var(--fs-2xl) + 0.25rem);
   font-weight: 700;
 }
 

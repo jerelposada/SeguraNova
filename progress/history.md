@@ -38,4 +38,11 @@
 - Feature id: 10
 - Estado final: done
 - Resultado de pruebas reportado: frontend tests en verde
-- Nota: Reviewer aprob� cambio m�nimo en RxJS; pruebas cubren error sin bloqueo.
+- Nota: Reviewer aprob� cambio m�nimo en RxJS; pruebas cubren error sin bloqueo.
+
+## 2026-06-08 - software_quality-improvements
+- Feature id: 12
+- Estado final: done
+- Flujo: spec -> coder -> reviewer aprobado
+- Resultado de pruebas reportado: Application.Tests 5/5, Repository.Tests 21/21, API.Tests 12/12 en verde
+- Nota: se completó la separación clean architecture en API moviendo lógica de negocio a Application, persistencia a Repository y servicios técnicos a Infrastructure, sin regresión funcional en autenticación.

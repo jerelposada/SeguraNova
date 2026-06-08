@@ -1,3 +1,13 @@
+import { routes, ADMIN_ROUTES } from './app.routes';
+
+describe('App routes wiring (admin)', () => {
+  it('exports ADMIN_ROUTES and admin route has children (T11)', () => {
+    const admin = routes.find(r => r.path === 'admin');
+    expect(ADMIN_ROUTES).toBeTruthy();
+    expect(admin).toBeTruthy();
+    expect((admin as any).children).toBeTruthy();
+  });
+});
 import { authGuard } from './core/auth/auth.guard';
 import { routes } from './app.routes';
 import { GapAnalysisComponent } from './features/admin/agent/components/gap-analysis.component';

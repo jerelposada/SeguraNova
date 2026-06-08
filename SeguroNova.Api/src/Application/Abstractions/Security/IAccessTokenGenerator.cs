@@ -1,6 +1,6 @@
 using Domain.Entities;
 
-namespace Repository.Authentication;
+namespace Application.Abstractions.Security;
 
 public interface IAccessTokenGenerator
 {
