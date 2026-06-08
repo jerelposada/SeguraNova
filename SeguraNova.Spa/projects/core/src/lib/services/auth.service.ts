@@ -46,6 +46,21 @@ export class AuthService {
       );
   }
 
+  public requestPasswordRecovery(email: string): Observable<void> {
+    return this.http
+      .post<{ message: string }>('/api/auth/password-recovery/request', { email })
+      .pipe(map(() => undefined));
+  }
+
+  public resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http
+      .post<void>('/api/auth/password-recovery/reset', {
+        token,
+        new_password: newPassword,
+      })
+      .pipe(map(() => undefined));
+  }
+
   public signOut(): void {
     localStorage.removeItem(this.accessKey);
     localStorage.removeItem(this.refreshKey);

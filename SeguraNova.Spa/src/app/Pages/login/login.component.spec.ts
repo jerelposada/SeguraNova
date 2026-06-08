@@ -161,4 +161,15 @@ describe('LoginComponent', () => {
       done();
     }, 0);
   });
+
+  it('should render forgot password link pointing to forgot-password route', () => {
+    authServiceMock.signIn.and.returnValue(of(void 0));
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+
+    const forgotPasswordLink = fixture.nativeElement.querySelector('.link--forgot') as HTMLAnchorElement;
+
+    expect(forgotPasswordLink.getAttribute('href')).toBe('/forgot-password');
+  });
 });

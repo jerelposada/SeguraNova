@@ -11,10 +11,15 @@ public class AuthContractsTests
     {
         var loginProperties = typeof(LoginRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         var refreshProperties = typeof(RefreshRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var passwordRecoveryRequestProperties = typeof(PasswordRecoveryRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        var passwordRecoveryResetProperties = typeof(PasswordRecoveryResetRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         Assert.Contains(loginProperties, p => p.Name == "Email" && p.PropertyType == typeof(string));
         Assert.Contains(loginProperties, p => p.Name == "Password" && p.PropertyType == typeof(string));
         Assert.Contains(refreshProperties, p => p.Name == "RefreshToken" && p.PropertyType == typeof(string));
+        Assert.Contains(passwordRecoveryRequestProperties, p => p.Name == "Email" && p.PropertyType == typeof(string));
+        Assert.Contains(passwordRecoveryResetProperties, p => p.Name == "Token" && p.PropertyType == typeof(string));
+        Assert.Contains(passwordRecoveryResetProperties, p => p.Name == "NewPassword" && p.PropertyType == typeof(string));
     }
 
     [Fact]
@@ -47,6 +52,16 @@ public class AuthContractsTests
             m.Name == "RevokeAsync" &&
             m.ReturnType == typeof(Task<bool>) &&
             HasParameters(m, typeof(Guid), typeof(string), typeof(CancellationToken)));
+
+        Assert.Contains(methods, m =>
+            m.Name == "RequestPasswordRecoveryAsync" &&
+            m.ReturnType == typeof(Task) &&
+            HasParameters(m, typeof(PasswordRecoveryRequest), typeof(CancellationToken)));
+
+        Assert.Contains(methods, m =>
+            m.Name == "ResetPasswordAsync" &&
+            m.ReturnType == typeof(Task<bool>) &&
+            HasParameters(m, typeof(PasswordRecoveryResetRequest), typeof(CancellationToken)));
     }
 
     [Fact]

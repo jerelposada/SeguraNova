@@ -36,6 +36,8 @@ export const ADMIN_ROUTES: Routes = [
 
 export const routes: Routes = [
     {'path': 'login', 'loadComponent': () => import('./Pages/login/login.component').then(m => m.LoginComponent)},
+    {'path': 'forgot-password', 'loadComponent': () => import('./Pages/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)},
+    {'path': 'reset-password', 'loadComponent': () => import('./Pages/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)},
     {
         'path': 'admin',
         'canActivate': [authGuard],

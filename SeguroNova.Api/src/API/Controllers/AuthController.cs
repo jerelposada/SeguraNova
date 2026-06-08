@@ -49,4 +49,23 @@ public sealed class AuthController(IAuthService authService) : ControllerBase
         await authService.RevokeAsync(userId, request.RefreshToken, ct);
         return NoContent();
     }
+
+    [HttpPost("password-recovery/request")]
+    public async Task<IActionResult> RequestPasswordRecovery([FromBody] PasswordRecoveryRequest request, CancellationToken ct)
+    {
+        await authService.RequestPasswordRecoveryAsync(request, ct);
+        return Ok(new { message = "If the email exists, recovery instructions were sent." });
+    }
+
+    [HttpPost("password-recovery/reset")]
+    public async Task<IActionResult> ResetPassword([FromBody] PasswordRecoveryResetRequest request, CancellationToken ct)
+    {
+        var resetApplied = await authService.ResetPasswordAsync(request, ct);
+        if (!resetApplied)
+        {
+            return BadRequest(new { message = "Invalid or expired recovery token." });
+        }
+
+        return NoContent();
+    }
 }

@@ -9,4 +9,8 @@ public interface IAuthService
     Task<AuthTokensResponse?> RefreshAsync(RefreshRequest request, CancellationToken ct);
 
     Task<bool> RevokeAsync(Guid userId, string refreshToken, CancellationToken ct);
+
+    Task RequestPasswordRecoveryAsync(PasswordRecoveryRequest request, CancellationToken ct);
+
+    Task<bool> ResetPasswordAsync(PasswordRecoveryResetRequest request, CancellationToken ct);
 }

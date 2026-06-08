@@ -15,6 +15,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
+    public DbSet<PasswordRecoveryToken> PasswordRecoveryTokens => Set<PasswordRecoveryToken>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureUser(modelBuilder.Entity<User>());
@@ -22,6 +24,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         ConfigureUserRole(modelBuilder.Entity<UserRole>());
         ConfigureKnowledgeBase(modelBuilder.Entity<UserKnowledgeBase>());
         ConfigureRefreshToken(modelBuilder.Entity<RefreshToken>());
+        ConfigurePasswordRecoveryToken(modelBuilder.Entity<PasswordRecoveryToken>());
     }
 
     private static void ConfigureUser(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<User> builder)
@@ -59,5 +62,14 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
         builder.Property(x => x.TokenHash).HasMaxLength(256).IsRequired();
         builder.Property(x => x.ExpiresAtUtc).IsRequired();
         builder.HasOne(x => x.User).WithMany(x => x.RefreshTokens).HasForeignKey(x => x.UserId);
+    }
+
+    private static void ConfigurePasswordRecoveryToken(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<PasswordRecoveryToken> builder)
+    {
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.TokenHash).HasMaxLength(256).IsRequired();
+        builder.Property(x => x.CreatedAtUtc).IsRequired();
+        builder.Property(x => x.ExpiresAtUtc).IsRequired();
+        builder.HasOne(x => x.User).WithMany(x => x.PasswordRecoveryTokens).HasForeignKey(x => x.UserId);
     }
 }

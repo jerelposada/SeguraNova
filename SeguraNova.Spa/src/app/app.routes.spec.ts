@@ -9,7 +9,6 @@ describe('App routes wiring (admin)', () => {
   });
 });
 import { authGuard } from './core/auth/auth.guard';
-import { routes } from './app.routes';
 import { GapAnalysisComponent } from './features/admin/agent/components/gap-analysis.component';
 import { HistorialConversacionesComponent } from './features/admin/agent/components/historial-conversaciones.component';
 import { RetrievalEffortComponent } from './features/admin/agent/components/retrieval-effort.component';
@@ -93,5 +92,17 @@ describe('app routes auth guard', () => {
     });
 
     expect(hasDependencyInjection).toBeFalse();
+  });
+
+  it('should expose forgot-password and reset-password public routes', () => {
+    const forgotPasswordRoute = routes.find((currentRoute) => currentRoute.path === 'forgot-password');
+    const resetPasswordRoute = routes.find((currentRoute) => currentRoute.path === 'reset-password');
+
+    expect(forgotPasswordRoute).toBeDefined();
+    expect(typeof forgotPasswordRoute?.loadComponent).toBe('function');
+    expect(resetPasswordRoute).toBeDefined();
+    expect(typeof resetPasswordRoute?.loadComponent).toBe('function');
+    expect(forgotPasswordRoute?.canActivate).toBeUndefined();
+    expect(resetPasswordRoute?.canActivate).toBeUndefined();
   });
 });

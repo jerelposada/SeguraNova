@@ -13,4 +13,6 @@ public sealed class User
     public List<UserKnowledgeBase> KnowledgeBases { get; set; } = [];
 
     public List<RefreshToken> RefreshTokens { get; set; } = [];
+
+    public List<PasswordRecoveryToken> PasswordRecoveryTokens { get; set; } = [];
 }

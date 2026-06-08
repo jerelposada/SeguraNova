@@ -90,11 +90,111 @@ public sealed class AuthServiceBehaviorTests
         Assert.False(revoked);
     }
 
+    [Fact]
+    public async Task RequestPasswordRecoveryAsync_WithExistingEmail_ShouldPersistOneHourToken()
+    {
+        var now = DateTime.UtcNow;
+        await using var context = await CreateContextAsync();
+        var user = await SeedUserAsync(context, "agent@seguranova.local", "secret123");
+        var service = CreateService(context, new FakeClock(now));
+
+        await service.RequestPasswordRecoveryAsync(new PasswordRecoveryRequest { Email = user.Email }, CancellationToken.None);
+
+        var token = await context.PasswordRecoveryTokens.SingleAsync();
+        Assert.Equal(user.Id, token.UserId);
+        Assert.Equal(now.AddHours(1), token.ExpiresAtUtc);
+        Assert.Null(token.UsedAtUtc);
+    }
+
+    [Fact]
+    public async Task RequestPasswordRecoveryAsync_WithUnknownEmail_ShouldNotPersistToken()
+    {
+        await using var context = await CreateContextAsync();
+        await SeedUserAsync(context, "agent@seguranova.local", "secret123");
+        var service = CreateService(context, new FakeClock(DateTime.UtcNow));
+
+        await service.RequestPasswordRecoveryAsync(new PasswordRecoveryRequest { Email = "missing@seguranova.local" }, CancellationToken.None);
+
+        Assert.Empty(context.PasswordRecoveryTokens);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_WithValidToken_ShouldUpdatePasswordAndPreventReuse()
+    {
+        var now = DateTime.UtcNow;
+        const string plainToken = "recovery-token";
+        await using var context = await CreateContextAsync();
+        var user = await SeedUserAsync(context, "agent@seguranova.local", "secret123");
+        context.PasswordRecoveryTokens.Add(new PasswordRecoveryToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            TokenHash = BCrypt.Net.BCrypt.HashPassword(plainToken),
+            CreatedAtUtc = now,
+            ExpiresAtUtc = now.AddHours(1),
+            UsedAtUtc = null
+        });
+        await context.SaveChangesAsync();
+        var service = CreateService(context, new FakeClock(now));
+
+        var resetApplied = await service.ResetPasswordAsync(new PasswordRecoveryResetRequest
+        {
+            Token = plainToken,
+            NewPassword = "NewPassword123"
+        }, CancellationToken.None);
+
+        var reused = await service.ResetPasswordAsync(new PasswordRecoveryResetRequest
+        {
+            Token = plainToken,
+            NewPassword = "AnotherPassword123"
+        }, CancellationToken.None);
+
+        Assert.True(resetApplied);
+        Assert.False(reused);
+        Assert.True(BCrypt.Net.BCrypt.Verify("NewPassword123", user.PasswordHash));
+        Assert.NotNull(context.PasswordRecoveryTokens.Single().UsedAtUtc);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_WithExpiredOrUnknownToken_ShouldReturnFalse()
+    {
+        var now = DateTime.UtcNow;
+        await using var context = await CreateContextAsync();
+        var user = await SeedUserAsync(context, "agent@seguranova.local", "secret123");
+        context.PasswordRecoveryTokens.Add(new PasswordRecoveryToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            TokenHash = BCrypt.Net.BCrypt.HashPassword("expired-token"),
+            CreatedAtUtc = now.AddHours(-2),
+            ExpiresAtUtc = now.AddMinutes(-1),
+            UsedAtUtc = null
+        });
+        await context.SaveChangesAsync();
+        var service = CreateService(context, new FakeClock(now));
+
+        var resetApplied = await service.ResetPasswordAsync(new PasswordRecoveryResetRequest
+        {
+            Token = "expired-token",
+            NewPassword = "NewPassword123"
+        }, CancellationToken.None);
+
+        Assert.False(resetApplied);
+    }
+
     private static AuthService CreateService(ApplicationDbContext context, ISystemClock clock)
     {
         IUserRepository userRepository = new UserRepository(context);
         IRefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository(context);
-        return new AuthService(userRepository, refreshTokenRepository, new FakeAccessTokenGenerator(), new FakePasswordHasher(), clock);
+        IPasswordRecoveryTokenRepository passwordRecoveryTokenRepository = new PasswordRecoveryTokenRepository(context);
+        return new AuthService(
+            userRepository,
+            refreshTokenRepository,
+            passwordRecoveryTokenRepository,
+            new FakePasswordRecoveryNotifier(),
+            new FakeAccessTokenGenerator(),
+            new FakePasswordHasher(),
+            clock);
     }
 
     private static async Task<User> SeedUserAsync(ApplicationDbContext context, string email, string password)
@@ -150,5 +250,13 @@ public sealed class AuthServiceBehaviorTests
     private sealed class FakeClock(DateTime utcNow) : ISystemClock
     {
         public DateTime UtcNow { get; } = utcNow;
+    }
+
+    private sealed class FakePasswordRecoveryNotifier : Application.Abstractions.Notifications.IPasswordRecoveryNotifier
+    {
+        public Task SendResetLinkAsync(string email, string resetUrl, CancellationToken ct)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

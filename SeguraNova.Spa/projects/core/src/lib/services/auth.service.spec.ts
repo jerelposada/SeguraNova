@@ -115,6 +115,46 @@ describe('AuthService', () => {
     });
   });
 
+  it('should request password recovery with email payload and map generic response to void', () => {
+    let result: void | undefined = 'unexpected-value' as unknown as void;
+
+    service.requestPasswordRecovery('agent@seguranova.local').subscribe((value) => {
+      result = value;
+    });
+
+    const request = httpMock.expectOne('/api/auth/password-recovery/request');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ email: 'agent@seguranova.local' });
+    request.flush({ message: 'Si el correo existe, recibirás instrucciones.' });
+
+    expect(result).toBeUndefined();
+  });
+
+  it('should send token and new password when resetting password', () => {
+    service.resetPassword('recovery-token', 'NewPassword123').subscribe();
+
+    const request = httpMock.expectOne('/api/auth/password-recovery/reset');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({
+      token: 'recovery-token',
+      new_password: 'NewPassword123',
+    });
+    request.flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  it('should propagate invalid token error when reset password fails', (done) => {
+    service.resetPassword('expired-token', 'NewPassword123').subscribe({
+      next: () => fail('Expected resetPassword to fail for invalid token'),
+      error: (error: { status: number }) => {
+        expect(error.status).toBe(400);
+        done();
+      },
+    });
+
+    const request = httpMock.expectOne('/api/auth/password-recovery/reset');
+    request.flush({ message: 'Invalid token' }, { status: 400, statusText: 'Bad Request' });
+  });
+
   it('should resolve route by role using access token payload', () => {
     localStorage.setItem('sn_access_token', createToken({ roles: ['admin_ti'], exp: futureExp() }));
 

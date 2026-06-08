@@ -13,7 +13,6 @@
         "status":  "done",
         "sdd":  true,
         "completed_at": "2026-06-06"
-        "completed_at":  "2026-06-04"
     },
     {
         "id":  3,
@@ -75,7 +74,30 @@
         "id":  10,
         "name":  "user_experience-improvements",
         "description":  "Al realizar la acciÃ³n de inicio de sesiÃ³n, si el usuario y/o la contraseÃ±a son incorrectos, se muestra el mensaje de error correctamente. sin embargo, el botÃ³n queda en un estado de \u0027iniciando sesiÃ³n\u0027 y con el loading infinito. Una vez que aparece el mensaje de error, el botÃ³n debe volver a su estado normal para que el usuario pueda intentar iniciar sesiÃ³n nuevamente sin necesidad de recargar la pÃ¡gina.",
-        "status":  "in_progress",
+        "status":  "done",
         "sdd":  true
+    },
+    {
+        "id":  11,
+        "name":  "ux_experience-improvements",
+        "description":  "Al realizar la accion de inicio de session, el usario es redirigido a la ruta /chat. Sin embargo, el panel administrativo no esta diseñado(no esta maquetado correctamente) no tiene correctos margenes, ni colores, ni tipografia correcta. El panel administrativo no es neumorphism. No Veo una correcta separacion entre sessiones. En conclusion esta muy mal a nivel de ux expirence.",
+        "status":  "done",
+        "sdd":  true
+    },
+    {
+        "id":  12,
+        "name":  "software_quality-improvements",
+        "description":  "En el proyecto de la api, esta mal aplicado clean architecture,ya que la capa de infrastrucuture se llama repository, y alli ahi servicios con logica de negocio, lo cual deberia estar en la capa de aplicacion. Aplica los cambioe e implementa correctamente clean architecture, creando una capa de infrastructure con servicios de infraestructura, y una capa de repository con los repositorios que se encarguen de la persistencia de datos. Tambien es necesario crear una capa de domain con las entidades del dominio, y una capa de application con los casos de uso y la logica de negocio. debes garantizar que sigan pasando los test que las funcionalidades ya creadas sigan funcionando como estan, y que compile correctamente",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-08"
+    },
+    {
+        "id":  13,
+        "name":  "user-authentication-password-recovery",
+        "description":  "quiero agregar un  endpoint para recuperar la contraseña, el flujo seria el siguiente: el usuario ingresa su correo electrónico en un formulario de recuperación de contraseña. El sistema verifica si el correo electrónico existe en la base de datos y, si es así, genera un token de recuperación único con una expiración de 1 hora. Luego, se envía un correo electrónico al usuario con un enlace que incluye el token. Al hacer clic en el enlace, el usuario es redirigido a una página donde puede ingresar una nueva contraseña. El sistema valida el token y, si es válido, actualiza la contraseña del usuario en la base de datos y marca el token como utilizado para evitar reutilizaciones.",
+        "status":  "done",
+        "sdd":  true,
+        "completed_at":  "2026-06-08"
     }
 ]
